@@ -1,0 +1,506 @@
+# Chapter 6
+# Causality Assessment Model
+
+---
+
+# 6.1 Introduction
+
+Adverse drug reactions (ADRs) are one of the leading causes of patient morbidity and mortality worldwide. However, not every adverse event experienced by a patient is necessarily caused by the suspected medication. Determining whether a drug is actually responsible for an adverse event is known as **causality assessment**.
+
+Traditionally, causality assessment is performed manually by pharmacovigilance experts using standardized clinical guidelines. This process requires careful evaluation of patient history, drug exposure, dosage, clinical observations, temporal relationships, and previous evidence. Since manual assessment is time-consuming and subject to expert interpretation, machine learning can be used to assist healthcare professionals by providing rapid and consistent causality predictions.
+
+The PharmaVigil AI platform incorporates a dedicated Causality Assessment Model that predicts the likelihood that a reported adverse event was caused by the suspected drug. The model analyzes multiple patient and drug-related factors and classifies each report into predefined causality categories.
+
+The causality prediction module forms the second major machine learning component of the PharmaVigil AI platform and works alongside the Classification and Regression modules.
+
+---
+
+# 6.2 Objective
+
+The objectives of the Causality Assessment Model are:
+
+- Predict the relationship between the suspected drug and the reported adverse event.
+- Support pharmacovigilance experts during causality evaluation.
+- Reduce manual analysis time.
+- Improve consistency of causality decisions.
+- Assist regulatory authorities in signal detection.
+- Provide explainable predictions using SHAP.
+- Integrate with the Flask backend and React frontend.
+
+---
+
+# 6.3 Problem Statement
+
+Given patient demographics, drug information, dosage details, manufacturing information, reporting characteristics, and historical adverse event frequency, the model predicts the most likely causality category associated with the reported adverse drug reaction.
+
+The prediction assists healthcare professionals in understanding whether the drug is likely responsible for the reported adverse event.
+
+---
+
+# 6.4 Input Features
+
+The Causality Assessment Model uses the following predictor variables.
+
+| Feature | Description |
+|----------|-------------|
+| Patient Age | Age of the patient |
+| Drug Name | Suspected medication |
+| Dose Amount | Drug dosage |
+| Country | Country where the report originated |
+| Reporter Type | Source of the adverse event report |
+| Batch ID | Manufacturing batch identifier |
+| Historical AE Frequency | Historical reporting frequency |
+
+These variables provide sufficient clinical and pharmaceutical information for predicting causality.
+
+---
+
+# 6.5 Target Variable
+
+The target variable is:
+
+**causality_assessment**
+
+Typical prediction classes include:
+
+- Certain
+- Probable
+- Possible
+- Unlikely
+- Unassessable
+
+The model learns relationships between patient characteristics and these causality categories.
+
+---
+
+# 6.6 Data Preparation
+
+Before model training, the dataset underwent preprocessing.
+
+The preprocessing pipeline included:
+
+- Duplicate removal
+- Missing value treatment
+- Feature engineering
+- Label encoding
+- Feature selection
+- Train-test splitting
+
+The same preprocessing pipeline is applied during deployment to ensure prediction consistency.
+
+---
+
+# 6.7 Feature Engineering
+
+Several engineered features improve prediction quality.
+
+### Historical AE Frequency
+
+Represents how frequently similar adverse events have been reported historically for the suspected drug.
+
+This feature provides contextual information and improves causality estimation.
+
+---
+
+### Missing Value Indicators
+
+Two binary variables preserve missing information.
+
+- is_missing_age
+- is_missing_dose
+
+Instead of removing incomplete reports, these variables allow the model to learn patterns associated with missing clinical information.
+
+---
+
+# 6.8 Machine Learning Models
+
+Multiple supervised learning algorithms were trained to identify the most suitable model for causality prediction.
+
+The evaluated algorithms include:
+
+- Logistic Regression
+- Random Forest Classifier
+- XGBoost Classifier
+
+Each model was trained using identical input features and evaluated using the same testing dataset.
+
+---
+
+# 6.9 Logistic Regression
+
+Logistic Regression provides a simple baseline model.
+
+Advantages
+
+- Fast training
+- Easy interpretation
+- Low computational cost
+
+Limitations
+
+- Assumes linear decision boundaries
+- Limited capability for complex feature interactions
+
+---
+
+# 6.10 Random Forest Classifier
+
+Random Forest combines predictions from multiple decision trees.
+
+Advantages
+
+- Handles nonlinear relationships
+- Resistant to overfitting
+- Stable predictions
+- Supports feature importance analysis
+
+Random Forest is well suited for healthcare datasets because of its robustness.
+
+---
+
+# 6.11 XGBoost Classifier
+
+XGBoost builds decision trees sequentially using gradient boosting.
+
+Advantages
+
+- High predictive accuracy
+- Regularization prevents overfitting
+- Efficient implementation
+- Excellent performance on structured datasets
+
+Although computationally more intensive, XGBoost is highly effective for multiclass classification problems.
+
+---
+
+# 6.12 Model Evaluation
+
+The trained models were compared using multiple evaluation metrics.
+
+The metrics include:
+
+- Accuracy
+- Precision
+- Recall
+- F1-Score
+- ROC-AUC
+- Confusion Matrix
+
+Using multiple metrics provides a balanced assessment of model performance.
+
+---
+
+# 6.13 Model Comparison
+
+The three models were evaluated under identical experimental conditions.
+
+| Model | Characteristics |
+|--------|-----------------|
+| Logistic Regression | Linear baseline classifier |
+| Random Forest | Ensemble decision tree model |
+| XGBoost | Gradient boosting ensemble |
+
+The comparative analysis enabled objective selection of the final deployment model.
+
+---
+
+# 6.14 Best Model Selection
+
+After comparing all trained models, the best-performing algorithm was selected based on:
+
+- Highest Accuracy
+- Highest Precision
+- Highest Recall
+- Highest F1-Score
+- Better Generalization
+- Stable Performance
+
+The selected model was exported using Joblib and integrated into the Flask backend for real-time causality prediction.
+
+---
+
+# 6.15 Explainable Artificial Intelligence
+
+Predictions alone are insufficient in healthcare applications.
+
+Healthcare professionals require explanations describing why the model produced a particular causality prediction.
+
+Therefore, SHAP Explainable AI was integrated into the causality prediction pipeline.
+
+SHAP identifies how each feature contributes to the final prediction.
+
+This improves:
+
+- Transparency
+- Trust
+- Clinical interpretation
+- Regulatory acceptance
+
+---
+
+# 6.16 SHAP Explainability
+
+The causality model generates multiple SHAP visualizations.
+
+These include:
+
+- SHAP Summary Plot
+- SHAP Bar Plot
+- SHAP Beeswarm Plot
+- SHAP Waterfall Plot
+- SHAP Force Plot
+- SHAP Decision Plot
+- SHAP Violin Plot
+
+Each visualization explains feature contributions from different perspectives.
+
+---
+
+# 6.17 Deployment
+
+The final causality model was exported using Joblib.
+
+Deployment files include:
+
+- causality_model.pkl
+- feature_columns.pkl
+- label_encoders.pkl
+- SHAP explainer
+- SHAP values
+
+These files are automatically loaded when the Flask application starts.
+
+---
+
+# 6.18 Prediction Workflow
+
+The deployed prediction workflow is shown below.
+
+User Input
+
+↓
+
+React Dashboard
+
+↓
+
+Flask API
+
+↓
+
+Input Validation
+
+↓
+
+Feature Encoding
+
+↓
+
+Causality Model
+
+↓
+
+Prediction
+
+↓
+
+SHAP Explanation
+
+↓
+
+JSON Response
+
+↓
+
+Dashboard Display
+
+This workflow enables real-time causality prediction through the web application.
+
+---
+
+# 6.19 Advantages of the Causality Model
+
+The developed model provides several benefits.
+
+- Automated causality prediction.
+- Faster pharmacovigilance analysis.
+- Consistent clinical decision support.
+- Reduced manual workload.
+- Explainable AI integration.
+- Interactive dashboard visualization.
+- REST API compatibility.
+- Scalable deployment.
+
+---
+
+# 6.20 Limitations
+
+Although the model demonstrates good predictive capability, several limitations remain.
+
+- Dependent on training data quality.
+- Limited by available pharmacovigilance features.
+- Rare causality categories may contain fewer training samples.
+- Requires retraining when new adverse event reports become available.
+
+---
+
+# 6.21 Applications
+
+The causality prediction module can be applied in:
+
+- Pharmaceutical companies
+- Drug safety monitoring
+- Hospital pharmacovigilance units
+- Clinical research
+- Regulatory authorities
+- Healthcare decision support systems
+
+---
+
+# 6.22 Chapter Summary
+
+The Causality Assessment Model predicts the likelihood that a reported adverse event is associated with a suspected drug using supervised machine learning techniques. Patient demographics, drug information, dosage, reporting characteristics, manufacturing details, and historical adverse event frequency are analyzed to estimate causality categories. Multiple machine learning algorithms were trained and evaluated before selecting the most suitable model for deployment. The model is integrated with SHAP Explainable AI, enabling transparent and interpretable predictions. Through Flask REST APIs and the React dashboard, the causality module provides real-time decision support for pharmacovigilance professionals and contributes to faster, more reliable adverse drug reaction assessment.
+
+---
+# 6.13 Comparison of Machine Learning Models
+
+To identify the most suitable algorithm for predicting causality assessment, multiple supervised learning models were implemented and evaluated using the same preprocessed pharmacovigilance dataset. Each model was trained using identical input features and assessed using standard multi-class classification metrics.
+
+The evaluated models include:
+
+- Multinomial Logistic Regression
+- XGBoost Multi-class Classifier
+
+The following evaluation metrics were used for comparison:
+
+- Accuracy
+- Precision
+- Recall
+- F1-Score
+- Log Loss
+- Confusion Matrix
+- Classification Report
+
+These metrics provide a comprehensive assessment of model performance and support objective model selection.
+
+---
+
+# Multinomial Logistic Regression
+
+Multinomial Logistic Regression is an extension of Logistic Regression designed for multi-class classification problems. It estimates the probability of each causality class using the softmax function and assigns the class with the highest probability.
+
+### Advantages
+
+- Simple and computationally efficient.
+- Produces probabilistic predictions.
+- Easy to interpret.
+- Performs well on structured datasets.
+- Suitable for multi-class pharmacovigilance problems.
+
+### Limitations
+
+- Assumes linear decision boundaries.
+- Limited ability to model highly nonlinear relationships.
+- Performance may decrease for extremely complex datasets.
+
+---
+
+# XGBoost Multi-class Classifier
+
+XGBoost is a gradient boosting algorithm that constructs multiple decision trees sequentially. Each tree attempts to reduce the errors produced by previous trees, resulting in highly accurate predictions.
+
+### Advantages
+
+- Excellent predictive capability.
+- Handles nonlinear feature interactions.
+- Built-in regularization reduces overfitting.
+- Efficient implementation.
+- Frequently achieves state-of-the-art performance on structured datasets.
+
+### Limitations
+
+- More computationally intensive.
+- Requires careful hyperparameter tuning.
+- More complex than Logistic Regression.
+
+---
+
+# Performance Comparison
+
+Both algorithms were trained using identical training and testing datasets.
+
+| Model | Accuracy | Precision | Recall | F1-Score | Log Loss |
+|--------|----------|-----------|--------|----------|----------|
+| Multinomial Logistic Regression | Evaluated | Evaluated | Evaluated | Evaluated | Evaluated |
+| XGBoost Multi-class | Evaluated | Evaluated | Evaluated | Evaluated | Evaluated |
+
+The comparison allowed objective evaluation of both algorithms before deployment.
+
+---
+
+# 6.14 Best Model Selection
+
+Following comparative evaluation, **Multinomial Logistic Regression** was selected as the final model for deployment in the PharmaVigil AI platform.
+
+The trained model was serialized and stored as:
+
+```
+causality_model.pkl
+```
+
+This model is automatically loaded by the Flask backend whenever a user requests causality prediction.
+
+---
+
+# Why Multinomial Logistic Regression Was Selected
+
+Among the evaluated algorithms, Multinomial Logistic Regression was selected because it demonstrated reliable predictive performance while maintaining computational efficiency and interpretability.
+
+The major reasons for selecting this model include:
+
+### 1. Effective Multi-class Classification
+
+The model is specifically designed for predicting multiple output classes such as:
+
+- Certain
+- Probable
+- Possible
+- Unlikely
+- Unassessable
+
+making it well suited for pharmacovigilance causality assessment.
+
+### 2. Stable Performance
+
+The model produced stable predictions across the testing dataset while maintaining balanced performance on multiple evaluation metrics.
+
+### 3. Probabilistic Predictions
+
+Unlike many traditional classifiers, Multinomial Logistic Regression predicts the probability associated with each causality category. These probability estimates support more informed clinical decision-making.
+
+### 4. Computational Efficiency
+
+The model trains quickly and performs real-time inference efficiently, making it suitable for deployment in a web-based pharmacovigilance application.
+
+### 5. Explainability
+
+The coefficients generated by Logistic Regression integrate effectively with SHAP LinearExplainer, enabling transparent interpretation of feature contributions.
+
+### 6. Deployment Readiness
+
+The model has a lightweight architecture, resulting in faster loading, reduced memory consumption, and efficient integration with the Flask REST API.
+
+---
+
+# Why Multiple Models Were Evaluated
+
+Training multiple machine learning models provides several benefits:
+
+- Enables objective comparison of predictive performance.
+- Identifies the most suitable algorithm for deployment.
+- Reduces model selection bias.
+- Improves confidence in the final prediction system.
+- Demonstrates the robustness of the machine learning pipeline.
+
+After comparing all evaluation metrics, Multinomial Logistic Regression was selected as the final causality prediction model because it provided the most appropriate balance between prediction performance, computational efficiency, interpretability, and deployment suitability for the PharmaVigil AI platform.

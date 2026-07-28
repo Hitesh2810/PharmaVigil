@@ -1,0 +1,370 @@
+# Chapter 13
+# User Guide
+
+---
+
+# 13.1 Introduction
+
+The PharmaVigil AI platform is a web-based application designed to assist healthcare professionals, pharmacovigilance analysts, researchers, pharmaceutical companies, and students in analyzing adverse drug reactions using Artificial Intelligence. The application provides three machine learning modules, SHAP Explainable AI visualizations, and an AI-powered chatbot to simplify pharmacovigilance analysis.
+
+This user guide explains how to install, access, navigate, and use each feature of the PharmaVigil AI platform.
+
+---
+
+# 13.2 Intended Users
+
+The application is designed for:
+
+- Healthcare Professionals
+- Pharmacovigilance Analysts
+- Clinical Researchers
+- Pharmaceutical Companies
+- Regulatory Authorities
+- Medical Students
+- Researchers
+- System Administrators
+
+---
+
+# 13.3 System Requirements
+
+The minimum system requirements are shown below.
+
+## Hardware Requirements
+
+- Processor: Intel Core i3 or above
+- RAM: 4 GB minimum (8 GB recommended)
+- Storage: 2 GB free space
+- Internet Connection
+
+---
+
+## Software Requirements
+
+- Windows 10/11
+- Google Chrome, Microsoft Edge, or Mozilla Firefox
+- Python 3.x (Backend)
+- Node.js (Frontend)
+
+---
+
+# 13.4 Starting the Application
+
+## Step 1
+
+Start the Flask backend server.
+
+```
+python app.py
+```
+
+---
+
+## Step 2
+
+Start the React frontend.
+
+```
+npm install
+npm start
+```
+
+---
+
+## Step 3
+
+Open the application in your web browser.
+
+```
+http://localhost:3000
+```
+
+The homepage of the PharmaVigil AI platform will appear.
+
+---
+
+# 13.5 Home Dashboard
+
+The Home Dashboard serves as the entry point to the application.
+
+It provides access to:
+
+- Classification Module
+- Causality Assessment Module
+- Regression Module
+- SHAP Explainability
+- AI Assistant
+- Dashboard Analytics
+
+The dashboard also displays summary statistics and navigation options.
+
+---
+
+# 13.6 Classification Module
+
+The Classification Module predicts whether an adverse drug reaction is classified as:
+
+- Serious
+- Non-Serious
+
+### Steps
+
+1. Open the Classification page.
+2. Enter the required patient information.
+3. Provide drug details.
+4. Enter dosage information.
+5. Enter country and reporter information.
+6. Click **Predict**.
+
+The system displays:
+
+- Prediction Result
+- Confidence Score
+- SHAP Explanation
+
+---
+
+# 13.7 Causality Assessment Module
+
+The Causality Module predicts the relationship between the suspected drug and the adverse event.
+
+Possible prediction categories include:
+
+- Certain
+- Probable
+- Possible
+- Unlikely
+- Unassessable
+
+### Steps
+
+1. Open the Causality page.
+2. Enter patient details.
+3. Enter drug information.
+4. Provide historical adverse event frequency.
+5. Click **Predict**.
+
+The prediction is displayed together with SHAP explanations.
+
+---
+
+# 13.8 Regression Module
+
+The Regression Module predicts the expected adverse event reporting count.
+
+### Steps
+
+1. Open the Regression page.
+2. Enter the required forecasting inputs.
+3. Click **Predict**.
+
+The system displays:
+
+- Predicted Adverse Event Count
+- Forecast Graph
+- SHAP Explanation
+
+---
+
+# 13.9 SHAP Explainability
+
+After every prediction, SHAP visualizations explain how each feature influenced the model's output.
+
+Available visualizations include:
+
+- Summary Plot
+- Bar Plot
+- Beeswarm Plot
+- Waterfall Plot
+- Force Plot
+- Decision Plot
+
+Users can analyze these plots to better understand the AI model's reasoning.
+
+---
+
+# 13.10 AI Assistant
+
+The platform includes a Gemini-powered AI Assistant.
+
+Users can ask questions such as:
+
+- What is pharmacovigilance?
+- Explain adverse drug reactions.
+- What does this prediction mean?
+- Explain SHAP values.
+- How do I use the dashboard?
+
+The AI Assistant responds in natural language and provides guidance related to the platform and pharmacovigilance concepts.
+
+---
+
+# 13.11 Dashboard Visualizations
+
+The dashboard includes several graphical visualizations.
+
+These include:
+
+- Bar Charts
+- Pie Charts
+- Histograms
+- Line Charts
+- Scatter Plots
+- Confusion Matrix
+- ROC Curve
+- SHAP Plots
+
+These visualizations assist users in understanding trends and prediction results.
+
+---
+
+# 13.12 Understanding Prediction Results
+
+The platform provides different outputs depending on the selected module.
+
+### Classification
+
+Output:
+
+- Serious
+- Non-Serious
+
+---
+
+### Causality
+
+Output:
+
+- Certain
+- Probable
+- Possible
+- Unlikely
+- Unassessable
+
+---
+
+### Regression
+
+Output:
+
+- Predicted Adverse Event Count
+
+Each prediction is accompanied by SHAP explanations where applicable.
+
+---
+
+# 13.13 Error Messages
+
+The application validates user input before processing.
+
+Common error messages include:
+
+- Missing required fields.
+- Invalid numerical values.
+- Unsupported input values.
+- Backend connection failure.
+- Prediction error.
+
+Users should verify their input and try again if an error occurs.
+
+---
+
+# 13.14 Best Practices
+
+To obtain reliable predictions:
+
+- Enter complete and accurate information.
+- Verify patient details before submission.
+- Review SHAP explanations alongside predictions.
+- Use the AI Assistant for clarification.
+- Keep the application updated.
+
+---
+
+# 13.15 Troubleshooting
+
+## Backend Not Running
+
+Ensure the Flask server is started before opening the frontend.
+
+---
+
+## Frontend Not Loading
+
+Verify that the React development server is running.
+
+---
+
+## Prediction Failed
+
+Check:
+
+- Internet connection (for AI Assistant).
+- Backend server status.
+- Input values.
+- Required model files.
+
+---
+
+## AI Assistant Not Responding
+
+Verify:
+
+- Gemini API key configuration.
+- Internet connectivity.
+- Backend API availability.
+
+---
+
+# 13.16 Frequently Asked Questions
+
+### Q1. What does the Classification Module predict?
+
+It predicts whether an adverse drug reaction is classified as Serious or Non-Serious.
+
+---
+
+### Q2. What is the purpose of the Causality Module?
+
+It predicts the likelihood that the suspected drug caused the reported adverse event.
+
+---
+
+### Q3. What does the Regression Module do?
+
+It predicts future adverse event reporting counts based on historical data.
+
+---
+
+### Q4. Why are SHAP explanations displayed?
+
+SHAP explains how each input feature influenced the AI model's prediction, improving transparency and interpretability.
+
+---
+
+### Q5. Can I ask pharmacovigilance questions through the AI Assistant?
+
+Yes. The Gemini-powered AI Assistant can answer questions related to pharmacovigilance concepts, machine learning predictions, and application usage.
+
+---
+
+# 13.17 Advantages for Users
+
+The PharmaVigil AI platform offers several advantages.
+
+- User-friendly interface.
+- Real-time AI predictions.
+- Interactive dashboards.
+- Explainable AI.
+- Intelligent chatbot support.
+- Easy navigation.
+- Quick pharmacovigilance analysis.
+- Reliable decision support.
+
+---
+
+# 13.18 Chapter Summary
+
+The User Guide provides step-by-step instructions for operating the PharmaVigil AI platform. It explains how to start the application, navigate the dashboard, use the Classification, Causality Assessment, and Regression modules, interpret SHAP explainability results, interact with the Gemini-powered AI Assistant, and troubleshoot common issues. By following this guide, users can effectively utilize the platform to analyze adverse drug reactions, understand AI-generated predictions, and support pharmacovigilance decision-making in a simple and intuitive manner.
+
+---

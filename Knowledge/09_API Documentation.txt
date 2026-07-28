@@ -1,0 +1,432 @@
+# Chapter 9
+# API Documentation
+
+---
+
+# 9.1 Introduction
+
+The PharmaVigil AI platform follows a client-server architecture where the React frontend communicates with a Flask REST API. The backend acts as an intermediary between the user interface and the machine learning models, handling data validation, preprocessing, prediction, explainability, and response generation.
+
+The REST API enables seamless interaction between the frontend dashboard and the AI models without exposing the underlying implementation details. All prediction requests are processed by the Flask server, which returns results in JSON format.
+
+---
+
+# 9.2 API Architecture
+
+The API architecture consists of three major components:
+
+```
+React Frontend
+       │
+       │ HTTP Request
+       ▼
+Flask REST API
+       │
+       ├── Data Validation
+       ├── Data Preprocessing
+       ├── Machine Learning Models
+       ├── SHAP Explainability
+       └── Response Generation
+       ▼
+JSON Response
+       ▼
+React Dashboard
+```
+
+The Flask backend loads all trained machine learning models during application startup and serves prediction requests in real time.
+
+---
+
+# 9.3 Technology Stack
+
+The backend API is developed using the following technologies.
+
+| Technology | Purpose |
+|------------|----------|
+| Flask | Backend Framework |
+| Flask-CORS | Cross-Origin Resource Sharing |
+| Python | Server-side Programming |
+| Joblib | Loading Trained Models |
+| Pandas | Data Processing |
+| NumPy | Numerical Computation |
+| SHAP | Explainable AI |
+| Scikit-learn | Machine Learning |
+| XGBoost | Boosting Models |
+
+---
+
+# 9.4 API Workflow
+
+The complete API workflow is illustrated below.
+
+```
+User Input
+
+↓
+
+React Form
+
+↓
+
+HTTP POST Request
+
+↓
+
+Flask REST API
+
+↓
+
+Input Validation
+
+↓
+
+Data Preprocessing
+
+↓
+
+Feature Encoding
+
+↓
+
+Machine Learning Model
+
+↓
+
+Prediction
+
+↓
+
+SHAP Explanation
+
+↓
+
+JSON Response
+
+↓
+
+Dashboard Display
+```
+
+---
+
+# 9.5 Model Loading
+
+When the Flask application starts, all trained machine learning models are loaded into memory.
+
+The backend loads:
+
+- classification_model.pkl
+- causality_model.pkl
+- regression_model.pkl
+- feature_columns.pkl
+- Label Encoders
+- SHAP Explainers
+
+Loading the models only once significantly reduces prediction latency.
+
+---
+
+# 9.6 API Endpoints
+
+The PharmaVigil AI backend exposes multiple REST API endpoints.
+
+---
+
+## Home Endpoint
+
+**Endpoint**
+
+```
+GET /
+```
+
+Purpose
+
+Returns the API status.
+
+Example Response
+
+```json
+{
+    "message": "PharmaVigil AI API Running"
+}
+```
+
+---
+
+## Classification Prediction Endpoint
+
+**Endpoint**
+
+```
+POST /predict/classification
+```
+
+Purpose
+
+Predicts whether the reported adverse event is **Serious** or **Non-Serious**.
+
+Request Body
+
+```json
+{
+  "patient_age": 45,
+  "drug_name": "Drug A",
+  "dose_amount_mg": 100,
+  "country": "India",
+  "reporter_type": "Physician",
+  "batch_id": "B101",
+  "historical_ae_frequency": 12
+}
+```
+
+Example Response
+
+```json
+{
+  "prediction": "Serious",
+  "confidence": 0.96
+}
+```
+
+---
+
+## Causality Prediction Endpoint
+
+**Endpoint**
+
+```
+POST /predict/causality
+```
+
+Purpose
+
+Predicts the causality category of the adverse drug reaction.
+
+Request Body
+
+```json
+{
+  "patient_age": 45,
+  "drug_name": "Drug A",
+  "dose_amount_mg": 100,
+  "country": "India",
+  "reporter_type": "Physician",
+  "batch_id": "B101",
+  "historical_ae_frequency": 12
+}
+```
+
+Example Response
+
+```json
+{
+  "prediction": "Probable",
+  "confidence": 0.91
+}
+```
+
+---
+
+## Regression Prediction Endpoint
+
+**Endpoint**
+
+```
+POST /predict/regression
+```
+
+Purpose
+
+Predicts the expected adverse event count.
+
+Request Body
+
+```json
+{
+  "historical_ae_frequency": 18
+}
+```
+
+Example Response
+
+```json
+{
+  "predicted_event_count": 21
+}
+```
+
+---
+
+## SHAP Explainability Endpoint
+
+**Endpoint**
+
+```
+POST /predict/shap
+```
+
+Purpose
+
+Generates SHAP explanations for the prediction.
+
+Example Response
+
+```json
+{
+  "prediction": "Serious",
+  "feature_importance": [
+    {
+      "feature": "Historical AE Frequency",
+      "importance": 0.82
+    },
+    {
+      "feature": "Dose Amount",
+      "importance": 0.36
+    }
+  ]
+}
+```
+
+---
+
+# 9.7 HTTP Methods
+
+| Method | Purpose |
+|---------|----------|
+| GET | Retrieve API status |
+| POST | Submit prediction request |
+
+---
+
+# 9.8 Request Validation
+
+Before processing user input, the API validates:
+
+- Required fields
+- Missing values
+- Numeric ranges
+- Supported categorical values
+- Data types
+
+Invalid requests return descriptive error messages.
+
+---
+
+# 9.9 Response Format
+
+Every successful API response follows JSON format.
+
+Example
+
+```json
+{
+    "status":"success",
+    "prediction":"Serious",
+    "confidence":0.95
+}
+```
+
+Error responses include:
+
+```json
+{
+    "status":"error",
+    "message":"Invalid input data"
+}
+```
+
+---
+
+# 9.10 Input Preprocessing
+
+Before prediction, the backend performs:
+
+- Missing value handling
+- Label encoding
+- Feature ordering
+- Feature validation
+- Data conversion
+- Numerical transformation
+
+The preprocessing pipeline is identical to the one used during model training.
+
+---
+
+# 9.11 Model Prediction
+
+Depending on the requested endpoint, the backend invokes one of the trained models.
+
+| Endpoint | Model |
+|----------|-------|
+| Classification | Random Forest Classifier |
+| Causality | Multinomial Logistic Regression |
+| Regression | Poisson Regressor |
+
+Each model generates predictions independently.
+
+---
+
+# 9.12 SHAP Integration
+
+After prediction, SHAP computes feature contributions.
+
+The API returns:
+
+- Prediction
+- Confidence score (where applicable)
+- Feature importance
+- SHAP values
+- Visualization data (if requested)
+
+This enables explainable decision support.
+
+---
+
+# 9.13 Error Handling
+
+The API handles common runtime errors such as:
+
+- Missing parameters
+- Invalid feature values
+- Incorrect data types
+- Model loading failures
+- Internal server errors
+
+Appropriate HTTP status codes are returned to the client.
+
+---
+
+# 9.14 Security Considerations
+
+The API incorporates several security measures.
+
+- Input validation
+- CORS configuration
+- Exception handling
+- Secure model loading
+- Protection against malformed requests
+
+These measures improve application reliability and security.
+
+---
+
+# 9.15 Advantages
+
+The REST API offers several benefits.
+
+- Real-time predictions.
+- Platform independence.
+- Easy frontend integration.
+- Lightweight communication.
+- JSON-based responses.
+- Scalable architecture.
+- Explainable AI support.
+
+---
+
+# 9.16 Chapter Summary
+
+The PharmaVigil AI platform uses a Flask-based REST API to provide secure and efficient communication between the React frontend and the machine learning models. The API handles data validation, preprocessing, model inference, SHAP explainability, and JSON response generation. Dedicated endpoints are available for adverse event seriousness classification, causality assessment, regression forecasting, and explainability. This modular API architecture enables real-time, scalable, and interpretable AI-powered pharmacovigilance services.
+
+---

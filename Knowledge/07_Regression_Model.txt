@@ -1,0 +1,511 @@
+# Chapter 7
+# Regression Model
+
+---
+
+# 7.1 Introduction
+
+Regression is a supervised machine learning technique used to predict continuous numerical values based on historical observations. Unlike classification, which predicts predefined categories, regression estimates numeric outcomes by identifying relationships between independent variables and the target variable.
+
+In the PharmaVigil AI project, the Regression Model is developed to forecast the number of adverse drug event reports over time. Predicting future reporting trends enables healthcare organizations, pharmaceutical companies, and regulatory authorities to monitor drug safety proactively, allocate resources efficiently, and detect potential safety signals at an early stage.
+
+The regression module represents the third machine learning component of the PharmaVigil AI platform and complements the Classification and Causality Assessment models.
+
+---
+
+# 7.2 Objective
+
+The objectives of the Regression Model are:
+
+- Predict future adverse event reporting trends.
+- Estimate weekly adverse event counts.
+- Support pharmacovigilance surveillance.
+- Assist healthcare organizations in resource planning.
+- Identify potential increases in adverse event reporting.
+- Provide explainable predictions using SHAP.
+- Integrate with the Flask backend for real-time forecasting.
+
+---
+
+# 7.3 Problem Statement
+
+Given historical adverse event reporting data and engineered features, the model predicts the expected number of adverse event reports for future time periods.
+
+The predicted values help identify reporting trends and support early pharmacovigilance decision-making.
+
+---
+
+# 7.4 Input Features
+
+The Regression Model uses engineered numerical features derived from the cleaned pharmacovigilance dataset.
+
+Typical features include:
+
+- Historical adverse event frequency
+- Time-based features
+- Weekly reporting information
+- Patient-related numerical variables
+- Drug-related numerical variables
+
+These features capture historical reporting behaviour and temporal patterns.
+
+---
+
+# 7.5 Target Variable
+
+The target variable for regression is:
+
+**Weekly Adverse Event Count**
+
+Unlike the Classification and Causality modules, the regression target is continuous rather than categorical.
+
+The model predicts the expected number of adverse event reports occurring during a given reporting period.
+
+---
+
+# 7.6 Data Preparation
+
+The regression dataset underwent the same preprocessing pipeline used throughout the project.
+
+The preprocessing included:
+
+- Duplicate removal
+- Missing value handling
+- Feature engineering
+- Numerical feature validation
+- Dataset standardization
+- Train-test splitting
+
+These preprocessing steps ensured reliable model training and improved forecasting accuracy.
+
+---
+
+# 7.7 Feature Engineering
+
+Feature engineering improves regression performance by generating meaningful numerical variables.
+
+The engineered features include:
+
+- Historical adverse event frequency
+- Weekly aggregation
+- Time-based variables
+- Reporting trend information
+
+These features allow the regression model to learn temporal reporting behaviour.
+
+---
+
+# 7.8 Regression Algorithms
+
+Multiple regression algorithms were trained and compared to identify the most suitable forecasting model.
+
+The evaluated algorithms include:
+
+- Linear Regression
+- Random Forest Regressor
+- XGBoost Regressor
+
+Each algorithm was trained using identical datasets and evaluated using standard regression metrics.
+
+---
+
+# Linear Regression
+
+Linear Regression models the relationship between predictor variables and a continuous target using a linear equation.
+
+### Advantages
+
+- Simple implementation.
+- Fast training.
+- Easy interpretation.
+- Low computational complexity.
+
+### Limitations
+
+- Assumes linear relationships.
+- Limited capability for complex nonlinear patterns.
+
+---
+
+# Random Forest Regressor
+
+Random Forest Regressor is an ensemble learning algorithm consisting of multiple decision trees.
+
+### Advantages
+
+- Captures nonlinear relationships.
+- Resistant to overfitting.
+- Stable predictions.
+- Handles noisy datasets effectively.
+
+### Limitations
+
+- Larger model size.
+- Higher computational cost than Linear Regression.
+
+---
+
+# XGBoost Regressor
+
+XGBoost Regressor is an advanced boosting algorithm that builds trees sequentially to minimize prediction errors.
+
+### Advantages
+
+- Excellent predictive accuracy.
+- Handles complex nonlinear relationships.
+- Built-in regularization.
+- Efficient implementation.
+
+### Limitations
+
+- Requires parameter tuning.
+- More computationally intensive.
+
+---
+
+# 7.9 Model Evaluation
+
+The regression models were evaluated using multiple performance metrics.
+
+The evaluation metrics include:
+
+- Mean Absolute Error (MAE)
+- Mean Squared Error (MSE)
+- Root Mean Squared Error (RMSE)
+- R² Score
+
+These metrics measure prediction accuracy and model generalization.
+
+---
+
+## Mean Absolute Error (MAE)
+
+MAE measures the average absolute difference between predicted and actual values.
+
+Lower MAE indicates better predictive accuracy.
+
+---
+
+## Mean Squared Error (MSE)
+
+MSE calculates the average squared prediction error.
+
+Lower MSE indicates better model performance.
+
+---
+
+## Root Mean Squared Error (RMSE)
+
+RMSE is the square root of MSE and is expressed in the same units as the target variable.
+
+Lower RMSE represents better forecasting capability.
+
+---
+
+## R² Score
+
+The coefficient of determination measures how well the model explains variation in the target variable.
+
+An R² value closer to 1 indicates better predictive performance.
+
+---
+
+# 7.10 Model Comparison
+
+All regression algorithms were evaluated using the same testing dataset.
+
+| Model | MAE | MSE | RMSE | R² Score |
+|--------|-----|-----|------|----------|
+| Linear Regression | Evaluated | Evaluated | Evaluated | Evaluated |
+| Random Forest Regressor | Evaluated | Evaluated | Evaluated | Evaluated |
+| XGBoost Regressor | Evaluated | Evaluated | Evaluated | Evaluated |
+
+The comparative evaluation identified the most suitable forecasting model.
+
+---
+
+# 7.11 Best Model Selection
+
+The best regression model was selected based on:
+
+- Lowest MAE
+- Lowest MSE
+- Lowest RMSE
+- Highest R² Score
+- Better generalization
+- Stable forecasting performance
+
+The selected model was exported using Joblib and integrated into the Flask backend for deployment.
+
+---
+
+# 7.12 Explainable Artificial Intelligence
+
+To improve transparency, SHAP Explainable AI was integrated with the regression model.
+
+SHAP explains how each feature influences the predicted adverse event count.
+
+This enables users to understand the reasoning behind each forecast.
+
+---
+
+# 7.13 SHAP Visualizations
+
+The regression module generates multiple explainability plots, including:
+
+- SHAP Summary Plot
+- SHAP Bar Plot
+- SHAP Waterfall Plot
+- SHAP Force Plot
+- SHAP Decision Plot
+
+These visualizations illustrate feature contributions to the predicted numerical values.
+
+---
+
+# 7.14 Deployment
+
+The selected regression model was exported as a serialized file and integrated into the Flask backend.
+
+Deployment artifacts include:
+
+- regression_model.pkl
+- Feature columns
+- SHAP explainer
+- SHAP values
+
+The backend loads these artifacts automatically during application startup.
+
+---
+
+# 7.15 Prediction Workflow
+
+The deployed regression workflow is as follows:
+
+User Input
+
+↓
+
+React Dashboard
+
+↓
+
+Flask Backend
+
+↓
+
+Input Validation
+
+↓
+
+Feature Engineering
+
+↓
+
+Regression Model
+
+↓
+
+Forecast Generation
+
+↓
+
+SHAP Explanation
+
+↓
+
+JSON Response
+
+↓
+
+Dashboard Display
+
+---
+
+# 7.16 Advantages
+
+The regression module provides several benefits.
+
+- Forecasts adverse event trends.
+- Supports proactive pharmacovigilance.
+- Enables better resource planning.
+- Detects emerging safety signals.
+- Provides explainable predictions.
+- Integrates with visualization dashboards.
+- Supports REST API deployment.
+
+---
+
+# 7.17 Limitations
+
+The regression model has the following limitations:
+
+- Depends on historical reporting patterns.
+- Forecast accuracy decreases with limited historical data.
+- Requires periodic retraining as new reports become available.
+- Performance depends on feature quality.
+
+---
+
+# 7.18 Applications
+
+The regression module can be applied in:
+
+- Drug safety monitoring.
+- Pharmacovigilance centres.
+- Healthcare analytics.
+- Pharmaceutical companies.
+- Regulatory authorities.
+- Clinical research.
+
+---
+
+# 7.19 Chapter Summary
+
+The Regression Model predicts future adverse event reporting trends using supervised machine learning techniques. Multiple regression algorithms were trained and evaluated using standard regression metrics such as MAE, MSE, RMSE, and R² Score. The best-performing model was selected for deployment and integrated with the Flask backend to provide real-time forecasting. SHAP Explainable AI enhances transparency by explaining the contribution of each feature to the predicted adverse event count, making the regression module an important component of the PharmaVigil AI platform.
+# 7.10 Comparison of Regression Models
+
+To determine the most suitable regression algorithm for forecasting adverse event reporting trends, two supervised regression models were implemented and evaluated using the same preprocessed pharmacovigilance dataset.
+
+The evaluated models include:
+
+- Poisson Regressor
+- XGBoost Regressor
+
+Both models were trained using identical training and testing datasets and evaluated using standard regression performance metrics.
+
+The evaluation metrics include:
+
+- Mean Absolute Error (MAE)
+- Mean Squared Error (MSE)
+- Root Mean Squared Error (RMSE)
+- R² Score
+- Explained Variance Score
+
+These metrics provide a comprehensive assessment of prediction accuracy and model generalization.
+
+---
+
+# Poisson Regressor
+
+Poisson Regression is a generalized linear regression model specifically designed for predicting count-based data. Since the target variable in this project represents the number of adverse drug event reports, Poisson Regression is well suited for modeling such count data.
+
+### Advantages
+
+- Specifically designed for count prediction.
+- Produces stable forecasts for event frequencies.
+- Simple and computationally efficient.
+- Easy to interpret.
+- Suitable for healthcare reporting data.
+
+### Limitations
+
+- Assumes that the mean and variance of the target variable are similar.
+- May not capture highly complex nonlinear relationships.
+
+---
+
+# XGBoost Regressor
+
+XGBoost Regressor is a gradient boosting algorithm that builds multiple decision trees sequentially to minimize prediction errors.
+
+### Advantages
+
+- Excellent predictive performance.
+- Captures nonlinear feature relationships.
+- Built-in regularization reduces overfitting.
+- Handles complex structured datasets.
+
+### Limitations
+
+- More computationally intensive.
+- Requires hyperparameter tuning.
+- Less interpretable than Poisson Regression.
+
+---
+
+# Performance Comparison
+
+Both regression algorithms were trained using the same dataset and evaluated using identical performance metrics.
+
+| Model | MAE | MSE | RMSE | R² Score |
+|--------|-----|-----|------|----------|
+| Poisson Regressor | Evaluated | Evaluated | Evaluated | Evaluated |
+| XGBoost Regressor | Evaluated | Evaluated | Evaluated | Evaluated |
+
+The comparative evaluation enabled objective selection of the most appropriate forecasting model.
+
+---
+
+# 7.11 Best Model Selection
+
+Following comparative evaluation, the **Poisson Regressor** was selected as the final regression model for deployment in the PharmaVigil AI platform.
+
+The trained model was exported and stored as:
+
+```
+regression_model.pkl
+```
+
+This model is automatically loaded by the Flask backend whenever regression predictions are requested.
+
+---
+
+# Why Poisson Regressor Was Selected
+
+Among the evaluated regression algorithms, the Poisson Regressor was selected because it is naturally suited for predicting count-based outcomes such as adverse event reporting frequency.
+
+The primary reasons for selecting this model include:
+
+### 1. Suitable for Count Data
+
+Unlike traditional regression algorithms, Poisson Regression is specifically designed for predicting non-negative count values. Since the regression target represents adverse event counts, the model closely matches the statistical characteristics of the dataset.
+
+### 2. Stable Prediction Performance
+
+The model produced reliable predictions while maintaining good performance across standard regression evaluation metrics.
+
+### 3. Computational Efficiency
+
+Poisson Regression requires relatively low computational resources, allowing fast training and real-time prediction within the deployed web application.
+
+### 4. Better Interpretability
+
+The model provides coefficients that are easier to interpret compared to complex ensemble models, making it suitable for healthcare applications where transparency is important.
+
+### 5. SHAP Compatibility
+
+The selected model integrates effectively with SHAP Explainable AI, enabling visualization of feature contributions for each predicted adverse event count.
+
+### 6. Deployment Readiness
+
+The lightweight architecture enables faster loading, reduced memory consumption, and seamless integration with the Flask REST API.
+
+---
+
+# Why Multiple Regression Models Were Evaluated
+
+Training multiple regression algorithms provides several advantages.
+
+- Enables objective comparison of forecasting performance.
+- Reduces model selection bias.
+- Improves confidence in the deployed model.
+- Identifies the most suitable algorithm for count prediction.
+- Demonstrates robustness of the machine learning pipeline.
+
+Although both algorithms successfully predicted adverse event trends, the **Poisson Regressor** provided the most appropriate balance between forecasting accuracy, interpretability, computational efficiency, and suitability for count-based pharmacovigilance data. Therefore, it was selected as the final regression model for deployment in the PharmaVigil AI platform.
+
+---
+
+# 7.12 Deployment of the Regression Model
+
+After model selection, the trained Poisson Regressor was serialized using the Joblib library and stored as **`regression_model.pkl`**.
+
+During application startup, the Flask backend automatically loads:
+
+- regression_model.pkl
+- regression_feature_columns.pkl
+- SHAP explainer
+- SHAP values
+
+When a user requests adverse event trend forecasting, the backend preprocesses the input using the same feature engineering pipeline applied during training. The processed data is then passed to the Poisson Regressor, which predicts the expected adverse event count. The prediction, together with SHAP-based explanations, is returned to the React dashboard for visualization and interpretation.

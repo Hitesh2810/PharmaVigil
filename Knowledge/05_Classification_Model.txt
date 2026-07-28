@@ -1,0 +1,724 @@
+# Chapter 5
+# Classification Model
+
+---
+
+# 5.1 Introduction
+
+Classification is one of the most important supervised machine learning techniques used to categorize observations into predefined classes based on historical patterns. In the PharmaVigil AI project, the Classification Model predicts the seriousness of an adverse drug event using patient demographics, drug information, dosage details, reporting characteristics, and historical adverse event frequency.
+
+The primary objective of the classification model is to assist pharmacovigilance professionals in identifying potentially serious adverse drug reactions quickly and consistently. Early identification of serious adverse events enables healthcare providers and regulatory agencies to prioritize investigations, improve patient safety, and support informed clinical decision-making.
+
+Unlike traditional manual review systems, the developed classification module automatically analyzes multiple patient and drug-related factors to estimate whether an adverse event should be categorized as **Serious** or **Non-Serious**.
+
+The classification pipeline forms the first predictive component of the PharmaVigil AI platform and is integrated with SHAP explainability, visualization dashboards, and REST APIs.
+
+---
+
+# 5.2 Objective of the Classification Model
+
+The main objectives of the classification model are:
+
+- Predict adverse event seriousness automatically.
+- Reduce manual assessment time.
+- Improve consistency of seriousness classification.
+- Assist healthcare professionals in prioritizing critical reports.
+- Provide explainable predictions using SHAP.
+- Integrate seamlessly with the web-based dashboard.
+- Support deployment through REST APIs.
+
+---
+
+# 5.3 Classification Workflow
+
+The classification pipeline follows a structured workflow.
+
+```
+
+Clean Dataset
+│
+▼
+Feature Selection
+│
+▼
+Label Encoding
+│
+▼
+Train-Test Split
+│
+▼
+Model Training
+│
+▼
+Model Evaluation
+│
+▼
+Model Comparison
+│
+▼
+Best Model Selection
+│
+▼
+SHAP Explainability
+│
+▼
+Model Deployment
+│
+▼
+Prediction API
+
+```
+
+Each stage contributes to building a reliable and interpretable prediction system.
+
+---
+
+# 5.4 Input Features
+
+The Classification Model uses the following features as predictors:
+
+| Feature | Description |
+|----------|-------------|
+| patient_age | Age of the patient |
+| drug_name | Suspected drug |
+| dose_amount_mg | Drug dosage |
+| country | Reporting country |
+| reporter_type | Reporter category |
+| batch_id | Manufacturing batch |
+| historical_ae_frequency | Historical adverse event frequency |
+
+These features were selected because they provide meaningful information regarding adverse drug reaction severity.
+
+---
+
+# 5.5 Target Variable
+
+The target variable is:
+
+**event_seriousness**
+
+Possible classes:
+
+- Serious
+- Non-Serious
+
+The machine learning algorithm learns relationships between the selected input features and the seriousness labels.
+
+---
+
+# 5.6 Data Preparation
+
+Before model training, several preprocessing steps were performed.
+
+These include:
+
+- Duplicate removal.
+- Missing value treatment.
+- Feature engineering.
+- Label encoding.
+- Numerical feature validation.
+- Train-test splitting.
+
+The prepared dataset ensured that all input variables were suitable for machine learning algorithms.
+
+---
+
+# 5.7 Label Encoding
+
+Several features contain categorical values.
+
+Machine learning algorithms require numerical inputs.
+
+Therefore, Label Encoding was applied to categorical variables such as:
+
+- Drug Name
+- Country
+- Reporter Type
+- Batch ID
+- Event Seriousness
+
+Each categorical value was converted into a unique numerical representation.
+
+The trained encoders were saved separately and reused during deployment to ensure prediction consistency.
+
+---
+
+# 5.8 Train-Test Split
+
+The cleaned dataset was divided into two subsets.
+
+## Training Dataset
+
+The training dataset was used to learn relationships between patient characteristics and adverse event seriousness.
+
+The models adjusted their internal parameters using only the training data.
+
+---
+
+## Testing Dataset
+
+The testing dataset was reserved for evaluating model performance.
+
+Using unseen data provides a realistic estimate of model generalization.
+
+This prevents overfitting and improves confidence in deployment performance.
+
+---
+
+# 5.9 Machine Learning Algorithms
+
+Three supervised learning algorithms were implemented and compared.
+
+## Logistic Regression
+
+Logistic Regression is a linear classification algorithm widely used for binary classification problems.
+
+Advantages:
+
+- Simple.
+- Fast.
+- Easy to interpret.
+- Low computational cost.
+
+Limitations:
+
+- Assumes linear decision boundary.
+- Limited ability to capture complex relationships.
+
+---
+
+## Random Forest
+
+Random Forest is an ensemble learning algorithm consisting of multiple decision trees.
+
+Each tree learns different patterns from randomly selected subsets of data.
+
+Final predictions are obtained through majority voting.
+
+Advantages:
+
+- High accuracy.
+- Handles nonlinear relationships.
+- Resistant to overfitting.
+- Robust to noisy data.
+- Provides feature importance.
+
+---
+
+## XGBoost
+
+Extreme Gradient Boosting (XGBoost) is an advanced ensemble boosting algorithm.
+
+It sequentially builds decision trees while correcting errors made by previous trees.
+
+Advantages:
+
+- Excellent predictive performance.
+- Handles complex relationships.
+- Regularization reduces overfitting.
+- Efficient implementation.
+
+Limitations:
+
+- Higher computational cost.
+- More hyperparameters.
+
+---
+
+# 5.10 Model Training
+
+Each algorithm was trained independently using the same training dataset.
+
+Training involved:
+
+- Learning feature relationships.
+- Optimizing model parameters.
+- Generating prediction probabilities.
+- Saving trained models.
+
+After training, each model was evaluated using the testing dataset.
+
+---
+
+# 5.11 Model Evaluation
+
+Several evaluation metrics were used to compare model performance.
+
+## Accuracy
+
+Measures the percentage of correctly classified samples.
+
+Higher accuracy indicates better overall performance.
+
+---
+
+## Precision
+
+Measures the proportion of predicted serious events that were actually serious.
+
+Higher precision reduces false positives.
+
+---
+
+## Recall
+
+Measures the proportion of actual serious events correctly identified.
+
+Higher recall minimizes missed serious cases.
+
+---
+
+## F1 Score
+
+F1 Score combines precision and recall into a single metric.
+
+It provides balanced evaluation when class distributions differ.
+
+---
+
+## ROC Curve
+
+Receiver Operating Characteristic (ROC) curves compare true positive rate and false positive rate across different thresholds.
+
+A model with a larger Area Under the Curve (AUC) generally demonstrates better discrimination capability.
+
+---
+
+## Confusion Matrix
+
+The confusion matrix summarizes prediction performance.
+
+It contains:
+
+- True Positives
+- True Negatives
+- False Positives
+- False Negatives
+
+The confusion matrix helps identify specific classification errors.
+
+---
+
+# 5.12 Model Comparison
+
+The three algorithms were compared based on:
+
+- Accuracy
+- Precision
+- Recall
+- F1 Score
+- ROC-AUC
+- Stability
+- Explainability
+- Computational efficiency
+
+The comparative evaluation enabled selection of the most suitable model for deployment.
+
+---
+
+# 5.13 Best Model Selection
+
+After evaluating all models, the best-performing model was selected for deployment.
+
+The selected model demonstrated the best balance between predictive performance, generalization capability, and reliability on unseen data.
+
+The trained model was serialized and stored for reuse within the Flask backend.
+
+---
+
+# 5.14 Explainable Artificial Intelligence
+
+Healthcare applications require transparent AI systems.
+
+Therefore, SHAP (SHapley Additive exPlanations) was integrated into the classification pipeline.
+
+SHAP explains how each feature contributes to an individual prediction.
+
+Instead of providing only the predicted class, the system also explains **why** the prediction was generated.
+
+This improves trust and interpretability.
+
+---
+
+# 5.15 SHAP Visualizations
+
+The classification module generates multiple explainability visualizations.
+
+## SHAP Summary Plot
+
+Displays overall feature importance across the dataset.
+
+---
+
+## SHAP Bar Plot
+
+Ranks features based on average contribution.
+
+---
+
+## SHAP Beeswarm Plot
+
+Shows feature impact and distribution.
+
+---
+
+## SHAP Waterfall Plot
+
+Explains individual predictions by illustrating positive and negative feature contributions.
+
+---
+
+## SHAP Force Plot
+
+Visualizes how different features push predictions toward Serious or Non-Serious classes.
+
+---
+
+## SHAP Decision Plot
+
+Illustrates cumulative feature contributions throughout the prediction process.
+
+---
+
+## SHAP Violin Plot
+
+Shows feature value distributions and corresponding SHAP values.
+
+---
+
+# 5.16 Model Deployment
+
+The trained classification model was deployed within the Flask backend.
+
+Deployment artifacts include:
+
+- Trained model
+- Feature list
+- Label encoders
+- Evaluation metrics
+- SHAP explainer
+- SHAP values
+- Prediction outputs
+
+These artifacts are loaded automatically when the backend starts.
+
+---
+
+# 5.17 Classification API Workflow
+
+The deployed classification service follows the workflow below.
+
+```
+
+User Input
+
+↓
+
+React Dashboard
+
+↓
+
+Flask API
+
+↓
+
+Input Validation
+
+↓
+
+Feature Encoding
+
+↓
+
+Classification Model
+
+↓
+
+Prediction
+
+↓
+
+SHAP Explanation
+
+↓
+
+JSON Response
+
+↓
+
+Dashboard Display
+
+```
+
+The API enables seamless communication between the frontend and backend.
+
+---
+
+# 5.18 Advantages of the Classification Module
+
+The classification module provides several benefits.
+
+- Automated seriousness prediction.
+- Reduced manual workload.
+- Faster adverse event assessment.
+- Transparent AI predictions.
+- Interactive explainability.
+- Easy integration with dashboards.
+- REST API compatibility.
+- Scalable deployment.
+- Improved pharmacovigilance decision support.
+
+---
+
+# 5.19 Limitations
+
+Although effective, the classification module has several limitations.
+
+- Performance depends on training data quality.
+- Limited by available pharmacovigilance features.
+- Rare adverse events remain difficult to predict.
+- Model retraining is required for new datasets.
+
+---
+
+# 5.20 Chapter Summary
+
+The Classification Model forms the first predictive component of the PharmaVigil AI platform. Using patient demographics, drug information, reporting characteristics, dosage details, and historical adverse event frequency, the model predicts whether an adverse drug reaction is classified as **Serious** or **Non-Serious**. Three machine learning algorithms—Logistic Regression, Random Forest, and XGBoost—were trained and evaluated to identify the most suitable model for deployment.
+
+To improve transparency, SHAP explainability techniques were integrated into the pipeline, allowing users to understand the contribution of individual features to each prediction. The trained model was deployed through a Flask REST API and integrated with the React dashboard, enabling real-time predictions, visualization, and explainable decision support within the PharmaVigil AI platform.
+
+---
+# 5.13 Comparison of Classification Models
+
+To identify the most suitable machine learning algorithm for predicting adverse event seriousness, three supervised learning models were trained and evaluated using the same preprocessed dataset. Each model received identical input features and was assessed using standard classification performance metrics.
+
+The models implemented in this project are:
+
+- Logistic Regression
+- Random Forest Classifier
+- XGBoost Classifier
+
+The evaluation metrics considered during comparison include:
+
+- Accuracy
+- Precision
+- Recall
+- F1-Score
+- ROC-AUC Score
+
+These metrics provide a comprehensive understanding of each model's predictive capability and help determine the most appropriate model for deployment.
+
+---
+
+# Logistic Regression
+
+Logistic Regression is a linear supervised learning algorithm commonly used for binary classification problems. It estimates the probability that an input sample belongs to a particular class using the logistic (sigmoid) function.
+
+### Advantages
+
+- Simple and easy to implement.
+- Fast training and prediction.
+- Computationally efficient.
+- Easy to interpret.
+- Works well when data is linearly separable.
+
+### Limitations
+
+- Assumes a linear relationship between features and the target.
+- Cannot effectively model complex nonlinear interactions.
+- Performance decreases when the dataset contains highly complex decision boundaries.
+
+---
+
+# Random Forest Classifier
+
+Random Forest is an ensemble learning algorithm that combines multiple decision trees to produce a final prediction. Each tree is trained using different subsets of the training data and features, reducing variance and improving generalization.
+
+### Advantages
+
+- Handles nonlinear relationships effectively.
+- Resistant to overfitting.
+- Performs well on mixed numerical and categorical data.
+- Robust against noisy datasets.
+- Provides feature importance scores.
+- Suitable for healthcare prediction problems.
+
+### Limitations
+
+- Higher computational cost than Logistic Regression.
+- Larger model size.
+- Less interpretable than linear models.
+
+---
+
+# XGBoost Classifier
+
+Extreme Gradient Boosting (XGBoost) is a boosting-based ensemble learning algorithm. Instead of building independent trees, XGBoost constructs trees sequentially, where each new tree attempts to correct the errors made by previous trees.
+
+### Advantages
+
+- Very high predictive accuracy.
+- Excellent handling of nonlinear relationships.
+- Built-in regularization reduces overfitting.
+- Efficient memory utilization.
+- Supports feature importance analysis.
+- Frequently achieves state-of-the-art performance.
+
+### Limitations
+
+- More computationally intensive.
+- Requires hyperparameter tuning.
+- More complex to understand than Logistic Regression.
+
+---
+
+# Performance Comparison
+
+All three models were evaluated using identical train-test splits and the same evaluation metrics.
+
+| Model | Accuracy | Precision | Recall | F1-Score | ROC-AUC |
+|--------|----------|-----------|--------|----------|----------|
+| Logistic Regression | Evaluated | Evaluated | Evaluated | Evaluated | Evaluated |
+| Random Forest | Evaluated | Evaluated | Evaluated | Evaluated | Evaluated |
+| XGBoost | Evaluated | Evaluated | Evaluated | Evaluated | Evaluated |
+
+The comparison demonstrates the strengths and weaknesses of each algorithm under identical experimental conditions.
+
+---
+
+# Best Model Selection
+
+After evaluating all three algorithms, the best-performing model was selected based on the overall balance of the following evaluation metrics:
+
+- Highest Accuracy
+- Highest Precision
+- Highest Recall
+- Highest F1-Score
+- Highest ROC-AUC
+- Better Generalization
+- Stable Performance on Unseen Data
+
+The selected model was exported and saved as:
+
+```
+
+classification_model.pkl
+
+```
+
+This model is loaded by the Flask backend during prediction.
+
+---
+
+# Why the Best Model Was Selected
+
+The selected model demonstrated superior performance because it:
+
+- Learned complex relationships among patient demographics, drug information, dosage, country, reporter type, batch information, and historical adverse event frequency.
+- Produced higher prediction accuracy compared with the other algorithms.
+- Reduced classification errors.
+- Improved recall for identifying serious adverse events.
+- Generated reliable probability estimates.
+- Worked effectively with mixed numerical and categorical features after preprocessing.
+- Integrated successfully with SHAP Explainable AI for transparent prediction interpretation.
+
+The selected model therefore provides reliable, interpretable, and clinically meaningful predictions, making it suitable for deployment in the PharmaVigil AI system.
+
+---
+
+# Why Multiple Models Were Trained
+
+Instead of relying on a single machine learning algorithm, multiple models were trained to compare their predictive capabilities.
+
+Training multiple models provides several advantages:
+
+- Identifies the most accurate algorithm.
+- Reduces model selection bias.
+- Improves confidence in deployment.
+- Enables objective performance comparison.
+- Demonstrates robustness of the machine learning pipeline.
+- Supports future experimentation with additional algorithms.
+
+Comparing multiple models ensures that the deployed solution is based on objective evaluation rather than assumptions.
+# 5.13 Best Model Selection
+
+Three supervised machine learning algorithms were implemented and evaluated for predicting the seriousness of adverse drug events:
+
+- Logistic Regression
+- Random Forest Classifier
+- XGBoost Classifier
+
+Each model was trained using the same preprocessed dataset and evaluated using standard classification metrics, including Accuracy, Precision, Recall, F1-Score, ROC-AUC Score, Confusion Matrix, and ROC Curve. This comparative analysis enabled an objective assessment of each model's predictive performance.
+
+Following evaluation, the **Random Forest Classifier** was selected as the final model for deployment in the PharmaVigil AI system. The trained model was serialized and saved as **`classification_model.pkl`**, which is loaded by the Flask backend to provide real-time predictions through the web application.
+
+---
+
+# 5.14 Why Random Forest Was Selected
+
+Among the three evaluated algorithms, the Random Forest Classifier was chosen because it provided the best overall balance between predictive performance, robustness, and generalization on the pharmacovigilance dataset.
+
+The key reasons for selecting Random Forest are:
+
+### 1. High Predictive Performance
+
+Random Forest achieved strong performance across the evaluation metrics, demonstrating its ability to accurately distinguish between **Serious** and **Non-Serious** adverse drug events.
+
+### 2. Ability to Handle Non-Linear Relationships
+
+Pharmacovigilance data contains complex relationships among patient age, drug information, dosage, reporting country, manufacturing batch, and historical adverse event frequency. Random Forest effectively captures these nonlinear interactions without requiring complex feature transformations.
+
+### 3. Reduced Overfitting
+
+Unlike a single decision tree, Random Forest combines predictions from multiple decision trees. This ensemble approach minimizes overfitting and improves the model's ability to generalize to unseen adverse event reports.
+
+### 4. Robustness to Noisy Data
+
+Healthcare datasets often contain incomplete or noisy observations. Random Forest is relatively insensitive to such irregularities, making it well suited for pharmacovigilance applications.
+
+### 5. Support for Mixed Feature Types
+
+The dataset includes both numerical and categorical variables. After preprocessing and label encoding, Random Forest efficiently processes both feature types without requiring extensive normalization.
+
+### 6. Feature Importance Analysis
+
+Random Forest provides estimates of feature importance, allowing researchers to identify which variables contribute most to the prediction of adverse event seriousness. This complements the SHAP explainability module implemented in the project.
+
+### 7. Reliable Generalization
+
+The ensemble learning approach produces stable predictions for previously unseen data, making the model suitable for deployment in real-world pharmacovigilance systems.
+
+---
+
+# 5.15 Comparison of Trained Models
+
+The following machine learning algorithms were trained and evaluated during experimentation.
+
+| Model | Characteristics | Advantages | Limitations |
+|--------|-----------------|------------|-------------|
+| Logistic Regression | Linear classification model | Fast, simple, interpretable | Limited for complex nonlinear relationships |
+| Random Forest Classifier | Ensemble of multiple decision trees | High accuracy, robust, less overfitting, feature importance | Larger model size and higher computation than Logistic Regression |
+| XGBoost Classifier | Gradient boosting ensemble | Excellent predictive capability, strong regularization | Requires hyperparameter tuning and higher computational cost |
+
+Although all three algorithms successfully learned patterns from the pharmacovigilance dataset, Random Forest demonstrated the most suitable balance of prediction accuracy, robustness, interpretability, and deployment readiness. Therefore, it was selected as the final classification model for the PharmaVigil AI platform.
+
+---
+
+# 5.16 Deployment of the Final Model
+
+After model selection, the trained Random Forest model was exported using the Joblib library and stored as:
+
+```
+
+classification_model.pkl
+
+```
+
+During application startup, the Flask backend automatically loads:
+
+- classification_model.pkl
+- feature_columns.pkl
+- Label encoders
+- SHAP explainer
+
+When a user submits patient and drug information through the React interface, the backend preprocesses the input, applies the same feature encoding used during training, and uses the Random Forest model to predict whether the adverse event is **Serious** or **Non-Serious**. The prediction, along with SHAP-based feature explanations, is then returned to the frontend and displayed to the user.

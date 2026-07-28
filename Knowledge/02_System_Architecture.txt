@@ -1,0 +1,1075 @@
+# 02 System Architecture
+
+# PharmaVigil AI System Architecture
+
+---
+
+# 1. Introduction
+
+System architecture defines the overall structure of the PharmaVigil AI platform, illustrating how different software components communicate and work together to perform pharmacovigilance analysis. A well-designed architecture is essential for ensuring scalability, maintainability, modularity, and efficient interaction between the frontend, backend, machine learning models, explainability modules, visualization services, and AI assistant.
+
+The PharmaVigil AI project follows a **modular three-tier architecture**, where each layer has clearly defined responsibilities. This separation of concerns makes the application easier to develop, test, maintain, and extend in the future.
+
+The three major architectural layers are:
+
+• Presentation Layer (React Frontend)
+
+• Application Layer (Flask Backend)
+
+• Intelligence Layer (Machine Learning + SHAP + Gemini AI)
+
+Each layer communicates using REST APIs, allowing independent development and deployment.
+
+---
+
+# 2. Overall Architecture
+
+The overall architecture consists of several interconnected modules that process user requests from data input to intelligent prediction and explanation.
+
+```
+                        +----------------------------------+
+                        |              USER                |
+                        +----------------------------------+
+                                     |
+                                     |
+                                     ▼
+                    +--------------------------------------+
+                    |         React Frontend               |
+                    |--------------------------------------|
+                    | Dashboard                            |
+                    | Prediction Forms                     |
+                    | Visualizations                       |
+                    | AI Chat Interface                    |
+                    +--------------------------------------+
+                                     |
+                           HTTP / REST API
+                                     |
+                                     ▼
+                    +--------------------------------------+
+                    |          Flask Backend              |
+                    |--------------------------------------|
+                    | Authentication                      |
+                    | Prediction APIs                     |
+                    | Visualization APIs                  |
+                    | Chatbot API                         |
+                    | Model Loader                        |
+                    +--------------------------------------+
+                                     |
+           --------------------------------------------------------
+           |                      |                     |          |
+           ▼                      ▼                     ▼          ▼
++-------------------+   +-------------------+   +-------------------+
+| Classification    |   | Causality Model   |   | Regression Model  |
++-------------------+   +-------------------+   +-------------------+
+           |                      |                     |
+           --------------------------------------------------------
+                                     |
+                                     ▼
+                     +-------------------------------+
+                     | Explainable AI (SHAP)         |
+                     +-------------------------------+
+                                     |
+                                     ▼
+                     +-------------------------------+
+                     | Visualization Engine          |
+                     +-------------------------------+
+                                     |
+                                     ▼
+                     +-------------------------------+
+                     | Gemini AI Assistant           |
+                     +-------------------------------+
+                                     |
+                                     ▼
+                              Response to User
+```
+
+The architecture ensures that every user request follows a structured workflow, making the system highly organized and scalable.
+
+---
+
+# 3. Architecture Design Principles
+
+The architecture of PharmaVigil AI is based on several software engineering principles.
+
+## 3.1 Modularity
+
+Each module performs a specific task independently.
+
+Examples include:
+
+• Classification Module
+
+• Causality Module
+
+• Regression Module
+
+• SHAP Module
+
+• Visualization Module
+
+• AI Assistant Module
+
+Because each module is independent, updates or improvements can be made without affecting the rest of the system.
+
+---
+
+## 3.2 Scalability
+
+The system has been designed so that new machine learning models, datasets, APIs, or dashboard pages can be added easily.
+
+Future enhancements may include:
+
+• Drug recommendation systems
+
+• Signal detection models
+
+• Deep learning models
+
+• Medical image analysis
+
+• Clinical decision support
+
+without redesigning the entire architecture.
+
+---
+
+## 3.3 Maintainability
+
+Each module is stored separately inside the project.
+
+Typical organization includes:
+
+```
+Backend/
+
+api/
+models/
+services/
+utils/
+chatbot/
+visualizations/
+```
+
+This improves code readability and debugging.
+
+---
+
+## 3.4 Reusability
+
+Machine learning models are stored independently using serialized files.
+
+Instead of retraining models every time the application starts, the backend loads pretrained models from disk.
+
+This reduces computation time significantly.
+
+---
+
+## 3.5 Loose Coupling
+
+Frontend and backend communicate only through REST APIs.
+
+Neither component directly accesses the internal implementation of the other.
+
+Benefits include:
+
+• Easier testing
+
+• Independent deployment
+
+• Better maintainability
+
+• Technology flexibility
+
+---
+
+# 4. System Components
+
+The PharmaVigil AI platform contains several interconnected components.
+
+## 4.1 User Layer
+
+The User Layer represents the end users interacting with the application.
+
+Potential users include:
+
+• Doctors
+
+• Healthcare Professionals
+
+• Pharmacovigilance Analysts
+
+• Regulatory Authorities
+
+• Researchers
+
+• Students
+
+• Data Scientists
+
+Users interact only with the frontend.
+
+They never directly access machine learning models.
+
+---
+
+## 4.2 Presentation Layer
+
+The Presentation Layer is developed using React.
+
+Responsibilities include:
+
+• Display dashboard
+
+• Accept prediction inputs
+
+• Show model outputs
+
+• Display graphs
+
+• Display SHAP plots
+
+• Display chatbot responses
+
+• Handle user navigation
+
+• Communicate with backend APIs
+
+The frontend is responsible only for visualization.
+
+No machine learning computations occur here.
+
+---
+
+### Frontend Pages
+
+The React application consists of multiple pages.
+
+Examples include:
+
+Dashboard
+
+↓
+
+Classification Prediction
+
+↓
+
+Causality Prediction
+
+↓
+
+Regression Prediction
+
+↓
+
+Visualization Dashboard
+
+↓
+
+SHAP Dashboard
+
+↓
+
+AI Assistant
+
+↓
+
+About Project
+
+Each page communicates with Flask APIs independently.
+
+---
+
+# 5. Backend Architecture
+
+The Flask backend acts as the central processing unit of the application.
+
+Every request passes through the backend before reaching machine learning models.
+
+Responsibilities include:
+
+• Loading models
+
+• Input validation
+
+• Data preprocessing
+
+• Prediction
+
+• SHAP generation
+
+• Returning JSON responses
+
+• Error handling
+
+• Serving visualizations
+
+• Communicating with Gemini AI
+
+---
+
+## Backend Request Flow
+
+```
+User Request
+
+↓
+
+Flask Route
+
+↓
+
+Validation
+
+↓
+
+Feature Encoding
+
+↓
+
+Load Model
+
+↓
+
+Prediction
+
+↓
+
+Generate SHAP
+
+↓
+
+Prepare JSON
+
+↓
+
+Return Response
+```
+
+This workflow ensures standardized processing of every prediction request.
+
+---
+
+# 6. Machine Learning Layer
+
+The Machine Learning Layer is the intelligence core of PharmaVigil AI.
+
+Three independent models are used.
+
+```
+Machine Learning Layer
+
+│
+
+├── Classification
+
+├── Causality
+
+└── Regression
+```
+
+Each model has independent:
+
+• Training notebook
+
+• Evaluation metrics
+
+• Prediction API
+
+• SHAP explanations
+
+• Stored artifacts
+
+This modular design allows models to evolve independently.
+
+---
+
+## Classification Module
+
+Purpose:
+
+Predict adverse event seriousness.
+
+Input:
+
+Patient Age
+
+Drug Name
+
+Country
+
+Reporter Type
+
+Dose Amount
+
+Batch ID
+
+Historical Frequency
+
+Output:
+
+Serious
+
+or
+
+Non-Serious
+
+The model also returns prediction probability and SHAP explanations.
+
+---
+
+## Causality Module
+
+Purpose:
+
+Predict drug-event causality.
+
+Input features are similar to the classification module but optimized for causality assessment.
+
+Outputs include:
+
+Predicted Class
+
+Probability
+
+SHAP Explanation
+
+Feature Contribution
+
+---
+
+## Regression Module
+
+Purpose:
+
+Forecast future adverse event counts.
+
+Outputs include:
+
+Predicted Count
+
+Residual Analysis
+
+Actual vs Predicted Graph
+
+Regression Metrics
+
+SHAP Analysis
+
+Unlike classification, regression predicts continuous numerical values rather than categorical labels.
+
+---
+---
+
+# 7. Frontend Architecture
+
+## 7.1 Introduction
+
+The frontend is the presentation layer of the PharmaVigil AI platform. It serves as the primary interface through which users interact with the application. Unlike the backend, which performs machine learning inference and data processing, the frontend is responsible for collecting user input, displaying predictions, rendering visualizations, and enabling interaction with the AI assistant.
+
+The frontend has been designed with the following objectives:
+
+- Provide a clean and intuitive user experience.
+- Enable easy navigation between different project modules.
+- Display prediction results in an understandable format.
+- Present interactive graphs and SHAP visualizations.
+- Allow users to communicate with the AI assistant through a conversational interface.
+- Support responsive layouts for different screen sizes.
+
+The frontend communicates exclusively with the Flask backend through RESTful APIs, ensuring loose coupling between presentation and business logic.
+
+---
+
+## 7.2 Frontend Components
+
+The frontend consists of several independent components.
+
+### Dashboard
+
+The dashboard acts as the home page of the application.
+
+Its responsibilities include:
+
+- Displaying project overview.
+- Showing quick statistics.
+- Providing navigation to different modules.
+- Presenting recently generated predictions.
+- Displaying summary cards.
+
+---
+
+### Prediction Module
+
+The prediction module allows users to enter patient information.
+
+Example inputs include:
+
+- Patient Age
+- Drug Name
+- Country
+- Reporter Type
+- Batch ID
+- Dose Amount
+- Historical Adverse Event Frequency
+
+After entering the information, users submit the form.
+
+The frontend sends the information to the backend using an HTTP POST request.
+
+---
+
+### Result Module
+
+The result module displays:
+
+- Predicted Class
+- Prediction Probability
+- Confidence Score
+- SHAP Explanation
+- Important Features
+
+The information is presented using tables, cards, and charts.
+
+---
+
+### Visualization Module
+
+This module displays graphical outputs generated by the backend.
+
+Examples include:
+
+- ROC Curves
+- Confusion Matrix
+- Feature Importance
+- SHAP Summary Plot
+- Beeswarm Plot
+- Waterfall Plot
+- Regression Plots
+
+The frontend requests visualization images from dedicated API endpoints.
+
+---
+
+### AI Chat Module
+
+The AI assistant page provides a conversational interface.
+
+Users can ask questions such as:
+
+- Explain the prediction.
+- Why is this event classified as serious?
+- What is SHAP?
+- Explain ROC Curve.
+- Describe feature importance.
+
+Messages are sent to the backend, which communicates with Gemini and returns intelligent responses.
+
+---
+
+# 8. Backend Internal Architecture
+
+## 8.1 Overview
+
+The Flask backend acts as the brain of the application.
+
+Its responsibilities include:
+
+- Loading trained models.
+- Validating user input.
+- Performing preprocessing.
+- Executing predictions.
+- Loading SHAP explainers.
+- Serving visualization images.
+- Managing AI assistant requests.
+- Returning JSON responses.
+
+---
+
+## 8.2 Backend Modules
+
+The backend can be divided into several logical modules.
+
+### API Layer
+
+Handles HTTP requests.
+
+Responsibilities include:
+
+- Receiving requests.
+- Validating inputs.
+- Calling appropriate services.
+- Returning JSON responses.
+
+---
+
+### Prediction Service
+
+Responsible for interacting with trained machine learning models.
+
+Each prediction service:
+
+- Loads the trained model.
+- Loads encoders.
+- Performs feature transformation.
+- Generates predictions.
+- Computes probabilities.
+- Returns results.
+
+---
+
+### SHAP Service
+
+Loads precomputed SHAP explainers.
+
+Generates:
+
+- Summary Plot
+- Force Plot
+- Waterfall Plot
+- Beeswarm Plot
+- Violin Plot
+- Decision Plot
+
+This module converts complex model outputs into explainable insights.
+
+---
+
+### Visualization Service
+
+Returns generated charts stored by the machine learning pipeline.
+
+Examples:
+
+- ROC Curves
+- Confusion Matrix
+- Feature Importance
+- Residual Plot
+- SHAP Images
+
+---
+
+### Chatbot Service
+
+This service communicates with the Gemini API.
+
+Workflow:
+
+User Question
+
+↓
+
+Prompt Builder
+
+↓
+
+Knowledge Retrieval
+
+↓
+
+Gemini API
+
+↓
+
+Generated Answer
+
+↓
+
+Response to Frontend
+
+---
+
+# 9. REST API Communication
+
+The frontend and backend communicate using REST APIs.
+
+Typical workflow:
+
+```
+Frontend
+
+↓
+
+HTTP POST Request
+
+↓
+
+Flask Route
+
+↓
+
+Prediction Service
+
+↓
+
+Machine Learning Model
+
+↓
+
+Prediction
+
+↓
+
+JSON Response
+
+↓
+
+Frontend
+```
+
+Example response:
+
+```json
+{
+  "prediction": "Serious",
+  "confidence": 0.94,
+  "probability": {
+      "Serious": 0.94,
+      "Non-Serious": 0.06
+  }
+}
+```
+
+Advantages of REST APIs include:
+
+- Platform independence
+- Scalability
+- Simplicity
+- Easy testing using Postman
+- Integration with external systems
+
+---
+
+# 10. Folder Structure
+
+A modular folder structure improves maintainability.
+
+```
+PharmaVigil-AI/
+
+Backend/
+│
+├── app.py
+├── routes/
+├── models/
+├── chatbot/
+├── services/
+├── visualizations/
+├── utils/
+├── config.py
+└── requirements.txt
+
+Frontend/
+│
+├── src/
+│   ├── components/
+│   ├── pages/
+│   ├── services/
+│   ├── assets/
+│   ├── hooks/
+│   └── App.js
+│
+└── package.json
+
+models/
+│
+├── classification/
+├── causality/
+└── regression/
+
+dataset/
+
+docs/
+
+README.md
+```
+
+Advantages:
+
+- Easy maintenance
+- Better organization
+- Faster debugging
+- Independent modules
+- Easier deployment
+
+---
+
+# 11. Data Flow Diagram (DFD)
+
+## Level 0 DFD
+
+```
+                +----------------------+
+                |        USER          |
+                +----------+-----------+
+                           |
+                           |
+                           ▼
+                 +----------------------+
+                 |    PharmaVigil AI    |
+                 +----------+-----------+
+                           |
+        ----------------------------------------------
+        |                 |                  |
+        ▼                 ▼                  ▼
+ Prediction         Visualization      AI Assistant
+```
+
+---
+
+## Level 1 DFD
+
+```
+User
+
+↓
+
+Input Form
+
+↓
+
+Backend API
+
+↓
+
+Preprocessing
+
+↓
+
+Machine Learning Model
+
+↓
+
+Prediction
+
+↓
+
+SHAP Explanation
+
+↓
+
+Visualization
+
+↓
+
+Display Result
+```
+
+---
+
+## Level 2 DFD
+
+```
+Patient Details
+
+↓
+
+Validation
+
+↓
+
+Encoding
+
+↓
+
+Feature Engineering
+
+↓
+
+Classification /
+Causality /
+Regression
+
+↓
+
+Prediction
+
+↓
+
+SHAP Values
+
+↓
+
+Charts
+
+↓
+
+JSON Response
+
+↓
+
+Frontend Dashboard
+```
+
+---
+
+# 12. Sequence Diagram
+
+```
+User
+
+↓
+
+Frontend
+
+↓
+
+Flask API
+
+↓
+
+Prediction Service
+
+↓
+
+Machine Learning Model
+
+↓
+
+Prediction
+
+↓
+
+SHAP Service
+
+↓
+
+Visualization Service
+
+↓
+
+JSON Response
+
+↓
+
+Frontend
+
+↓
+
+User
+```
+
+The sequence diagram illustrates the chronological interaction between various system components.
+
+---
+
+# 13. Component Diagram
+
+```
++----------------------+
+| React Frontend       |
++----------+-----------+
+           |
+           |
++----------v-----------+
+| Flask Backend        |
++----------+-----------+
+           |
+   -------------------------
+   |       |       |        |
+   ▼       ▼       ▼        ▼
+Classification
+Causality
+Regression
+Gemini
+
+           |
+           ▼
+SHAP Engine
+
+           |
+           ▼
+Visualization Engine
+```
+
+Each component performs a dedicated responsibility, improving maintainability and scalability.
+
+---
+
+# 14. Deployment Architecture
+
+The deployment architecture consists of:
+
+```
+Browser
+
+↓
+
+React Application
+
+↓
+
+Flask Server
+
+↓
+
+Machine Learning Models
+
+↓
+
+SHAP Files
+
+↓
+
+Visualization Files
+
+↓
+
+Gemini API
+```
+
+Deployment can be performed on:
+
+- Local Machine
+- Render
+- Railway
+- Azure
+- AWS
+- Google Cloud
+
+---
+
+# 15. Security Architecture
+
+The backend validates every incoming request.
+
+Security measures include:
+
+- Input validation.
+- Exception handling.
+- Environment variables for API keys.
+- Secure model loading.
+- Separation of frontend and backend.
+- Restricted API access.
+- JSON serialization.
+- Error logging.
+
+Sensitive information such as API keys should never be hardcoded and should be stored in environment variables.
+
+---
+
+# 16. Advantages of the System Architecture
+
+The proposed architecture offers several advantages:
+
+- Modular design.
+- Independent machine learning modules.
+- Easy integration of new models.
+- Scalable frontend and backend.
+- Explainable AI support.
+- Interactive dashboard.
+- AI-powered conversational interface.
+- RESTful communication.
+- Easy deployment.
+- Improved maintainability.
+- Better debugging.
+- Reusable code structure.
+- Clear separation of concerns.
+- Support for future enhancements.
+
+---
+
+# 17. Chapter Summary
+
+The PharmaVigil AI system architecture follows a modern modular design that separates presentation, application, intelligence, and explainability into independent layers. This architecture enables seamless communication between the React frontend, Flask backend, machine learning models, SHAP explainability engine, visualization services, and Gemini-powered AI assistant.
+
+By adopting RESTful APIs and a layered architecture, the platform achieves high maintainability, scalability, and extensibility. Future enhancements such as additional predictive models, cloud deployment, authentication systems, or integration with hospital information systems can be incorporated with minimal changes to the existing framework.

@@ -1,0 +1,799 @@
+# Chapter 3
+# Dataset Description and Analysis
+
+---
+
+# 3.1 Introduction
+
+Data forms the foundation of every machine learning system. The quality, consistency, completeness, and relevance of the dataset directly influence the performance of predictive models. In pharmacovigilance applications, datasets consist of adverse drug event reports collected from healthcare professionals, hospitals, pharmaceutical companies, and regulatory authorities. These reports contain valuable information regarding drug usage, patient demographics, clinical outcomes, adverse reactions, and causality assessments.
+
+For the PharmaVigil AI project, a pharmacovigilance dataset was developed to simulate real-world adverse drug event reporting. The dataset contains detailed patient information, drug information, reporting information, manufacturing details, dosage information, clinical outcomes, and adverse event characteristics.
+
+Initially, the raw dataset consisted of approximately **9,000 adverse event records**. Since raw healthcare datasets often contain duplicate records, missing values, inconsistent formats, noisy entries, and irrelevant observations, extensive preprocessing was performed before model development.
+
+The preprocessing pipeline included data cleaning, missing value handling, duplicate removal, feature engineering, label encoding, validation, and quality assessment. After preprocessing, the final curated dataset used for model training and evaluation contained **81 high-quality records** with **22 carefully selected attributes**. This cleaned dataset provided reliable input for the Classification, Causality Assessment, and Regression models implemented in this project.
+
+The dataset serves as the primary source of information for all machine learning models developed in PharmaVigil AI.
+
+---
+
+# 3.2 Dataset Overview
+
+The dataset contains structured pharmacovigilance information describing adverse drug event reports.
+
+Each row represents one adverse drug event report submitted by a healthcare professional or reporting authority.
+
+Each column represents a specific characteristic of the reported adverse event.
+
+The dataset includes patient information, drug details, clinical outcomes, reporting characteristics, manufacturing information, dosage details, and historical reporting statistics.
+
+---
+
+## Dataset Summary
+
+| Property | Description |
+|------------|-----------------------------|
+| Dataset Name | AE FINAL |
+| Domain | Pharmacovigilance |
+| Original Dataset Size | Approximately 9,000 records |
+| Final Clean Dataset | 81 records |
+| Number of Features | 22 |
+| Data Type | Structured Tabular Dataset |
+| Machine Learning Tasks | Classification, Causality Prediction, Regression |
+| Target Variables | Event Seriousness, Causality Assessment, Weekly Event Count |
+| Storage Format | CSV |
+
+---
+
+# 3.3 Dataset Purpose
+
+The dataset was prepared to support multiple pharmacovigilance prediction tasks.
+
+The objectives of the dataset include:
+
+• Predict adverse event seriousness.
+
+• Predict causality assessment.
+
+• Forecast adverse event reporting trends.
+
+• Perform explainable AI analysis.
+
+• Generate visualization dashboards.
+
+• Support AI-assisted interpretation.
+
+The dataset was specifically designed to support multiple machine learning pipelines within a single integrated system.
+
+---
+
+# 3.4 Dataset Characteristics
+
+The pharmacovigilance dataset possesses the following characteristics.
+
+### Structured Dataset
+
+The dataset is organized in tabular format where rows represent individual adverse event reports and columns represent report attributes.
+
+---
+
+### Mixed Data Types
+
+The dataset contains both numerical and categorical variables.
+
+Numerical Features
+
+- Patient Age
+- Dose Amount
+- Historical AE Frequency
+
+Categorical Features
+
+- Country
+- Drug Name
+- Reporter Type
+- Patient Sex
+- Manufacturing Site
+- Route of Administration
+- Outcome
+- Seriousness
+- Causality
+
+Date Features
+
+- Report Received Date
+- Onset Date
+
+Boolean Features
+
+- Missing Age Flag
+- Missing Dose Flag
+
+---
+
+### Supervised Learning Dataset
+
+The dataset supports supervised machine learning.
+
+Target variables include:
+
+• Event Seriousness
+
+• Causality Assessment
+
+Regression Target
+
+• Weekly Adverse Event Count
+
+---
+
+# 3.5 Dataset Columns
+
+The cleaned dataset contains 22 attributes.
+
+Each attribute contributes important information to pharmacovigilance analysis.
+
+---
+
+## 1. report_id
+
+Description:
+
+A unique identifier assigned to every adverse event report.
+
+Purpose:
+
+Ensures that every report can be uniquely identified.
+
+Example:
+
+AE-2025-0046
+
+Data Type:
+
+String
+
+---
+
+## 2. report_received_date
+
+Description:
+
+Date on which the adverse event report was received.
+
+Purpose:
+
+Supports temporal analysis and regression forecasting.
+
+Data Type:
+
+Date
+
+---
+
+## 3. country
+
+Description:
+
+Country from which the adverse event report originated.
+
+Purpose:
+
+Allows geographical analysis of adverse events.
+
+Machine learning models use this feature to identify country-specific reporting patterns.
+
+Data Type:
+
+Categorical
+
+---
+
+## 4. reporter_type
+
+Description:
+
+Specifies who submitted the adverse event report.
+
+Examples include healthcare professionals and other reporting sources.
+
+Purpose:
+
+Different reporter categories may demonstrate different reporting behaviours.
+
+Data Type:
+
+Categorical
+
+---
+
+## 5. patient_age
+
+Description:
+
+Age of the patient experiencing the adverse event.
+
+Purpose:
+
+Patient age is one of the strongest predictors of drug safety and adverse event severity.
+
+Data Type:
+
+Numerical
+
+---
+
+## 6. is_missing_age
+
+Description:
+
+Binary indicator showing whether patient age was originally missing.
+
+Purpose:
+
+Instead of deleting incomplete records, the project preserves missing information using an indicator variable.
+
+Possible Values
+
+0
+
+1
+
+Data Type
+
+Boolean
+
+---
+
+## 7. patient_sex
+
+Description
+
+Gender of the patient.
+
+Purpose
+
+Drug reactions often vary between male and female populations.
+
+Possible Values
+
+Male
+
+Female
+
+Data Type
+
+Categorical
+
+---
+
+## 8. drug_name
+
+Description
+
+Name of the suspected drug responsible for the reported adverse event.
+
+Purpose
+
+Represents one of the most influential variables for both seriousness prediction and causality assessment.
+
+Data Type
+
+Categorical
+
+---
+
+## 9. drug_ndc_code
+
+Description
+
+National Drug Code identifying the pharmaceutical product.
+
+Purpose
+
+Provides standardized identification of medications.
+
+Data Type
+
+Categorical
+
+---
+
+## 10. indication
+
+Description
+
+Medical condition for which the drug was prescribed.
+
+Purpose
+
+Provides clinical context for adverse event interpretation.
+
+Data Type
+
+Categorical
+
+---
+---
+
+# 3.6 Detailed Description of Remaining Dataset Attributes
+
+The remaining attributes of the dataset provide additional clinical, manufacturing, treatment, and reporting information. These variables improve the predictive capability of the machine learning models and contribute to more accurate pharmacovigilance analysis.
+
+---
+
+## 11. adverse_event_term
+
+### Description
+
+The **adverse_event_term** represents the primary medical condition, symptom, or adverse reaction experienced by the patient after consuming the suspected drug.
+
+This attribute records the clinical manifestation observed following drug administration.
+
+Examples include:
+
+- Headache
+- Fever
+- Skin Rash
+- Vomiting
+- Dizziness
+- Nausea
+- Liver Injury
+- Kidney Failure
+- Allergic Reaction
+- Fatigue
+
+### Importance
+
+This is one of the most clinically significant variables because it directly represents the observed adverse reaction.
+
+Different adverse events have different severity levels.
+
+For example:
+
+- Mild headache usually represents a low-risk event.
+- Organ failure represents a serious adverse reaction.
+
+Although the classification model primarily predicts seriousness using engineered features, adverse event terminology is important for pharmacovigilance analysis and future extensions.
+
+### Data Type
+
+Categorical
+
+---
+
+## 12. event_seriousness
+
+### Description
+
+This column represents the seriousness level assigned to each adverse drug event.
+
+Possible values include:
+
+- Serious
+- Non-Serious
+
+### Purpose
+
+This column is used as the **target variable** for the Classification Model.
+
+The machine learning model learns relationships between patient information and seriousness labels.
+
+### Importance
+
+This attribute is one of the primary outputs of the pharmacovigilance platform.
+
+Predicting serious adverse events helps healthcare professionals prioritize investigations and improve patient safety.
+
+---
+
+## 13. outcome
+
+### Description
+
+The outcome column represents the final clinical status of the patient following the adverse event.
+
+Possible examples include:
+
+- Recovered
+- Recovering
+- Not Recovered
+- Fatal
+- Unknown
+
+### Importance
+
+Patient outcome provides valuable insight into the clinical impact of adverse drug reactions.
+
+Although outcome is not always used as a prediction feature, it is valuable for exploratory analysis and visualization.
+
+### Data Type
+
+Categorical
+
+---
+
+## 14. onset_date
+
+### Description
+
+This attribute records the date on which the adverse event first appeared after drug administration.
+
+### Importance
+
+The onset date enables temporal analysis.
+
+Researchers can calculate:
+
+- Time to onset
+- Reporting delay
+- Weekly adverse event counts
+- Monthly trends
+
+The regression module benefits from time-related information derived from onset dates.
+
+### Data Type
+
+Date
+
+---
+
+## 15. batch_id
+
+### Description
+
+Batch ID identifies the manufacturing batch of the suspected pharmaceutical product.
+
+### Importance
+
+Manufacturing defects sometimes affect only specific production batches.
+
+Including batch information enables detection of batch-specific safety signals.
+
+The Classification and Causality models use encoded batch identifiers as predictive features.
+
+### Data Type
+
+Categorical
+
+---
+
+## 16. manufacturing_site
+
+### Description
+
+The manufacturing_site column specifies where the pharmaceutical product was manufactured.
+
+### Importance
+
+This feature supports pharmacovigilance investigations involving manufacturing quality.
+
+It can assist regulatory authorities in identifying production-related issues.
+
+### Data Type
+
+Categorical
+
+---
+
+## 17. dose_amount_mg
+
+### Description
+
+This attribute records the dosage administered to the patient.
+
+The value is represented in milligrams (mg).
+
+### Importance
+
+Drug dosage significantly influences adverse reaction probability.
+
+Higher dosages may increase toxicity risk.
+
+Lower dosages may produce fewer adverse effects.
+
+Consequently, dose amount is an important predictive feature.
+
+### Data Type
+
+Numerical
+
+---
+
+## 18. is_missing_dose
+
+### Description
+
+Binary indicator showing whether dosage information was missing in the original dataset.
+
+Possible values:
+
+0 → Available
+
+1 → Missing
+
+### Importance
+
+Instead of deleting incomplete records, missing information is preserved using indicator variables.
+
+This approach improves model robustness while minimizing information loss.
+
+### Data Type
+
+Boolean
+
+---
+
+## 19. route_of_administration
+
+### Description
+
+Specifies how the drug entered the patient's body.
+
+Examples include:
+
+- Oral
+
+- Intravenous
+
+- Intramuscular
+
+- Topical
+
+- Subcutaneous
+
+### Importance
+
+Drug absorption varies significantly across administration routes.
+
+Route differences may influence adverse event occurrence.
+
+### Data Type
+
+Categorical
+
+---
+
+## 20. concomitant_medications
+
+### Description
+
+Represents additional medications consumed simultaneously with the suspected drug.
+
+### Importance
+
+Drug-drug interactions are among the leading causes of adverse reactions.
+
+Including concomitant medications improves future pharmacovigilance analyses.
+
+### Data Type
+
+Categorical
+
+---
+
+## 21. causality_assessment
+
+### Description
+
+Represents the likelihood that the reported adverse event was caused by the suspected drug.
+
+Typical classes include:
+
+- Certain
+
+- Probable
+
+- Possible
+
+- Unlikely
+
+- Unassessable
+
+### Importance
+
+This column serves as the target variable for the Causality Prediction Model.
+
+The model learns to estimate causality using patient demographics, drug information, dosage, reporting information, and historical frequencies.
+
+### Data Type
+
+Categorical
+
+---
+
+## 22. historical_ae_frequency
+
+### Description
+
+Historical adverse event frequency represents the historical occurrence rate of similar adverse events associated with the reported drug.
+
+### Importance
+
+Historical reporting frequency provides contextual knowledge.
+
+Drugs with historically high adverse event frequencies may demonstrate increased prediction probabilities.
+
+This engineered feature improves predictive performance.
+
+### Data Type
+
+Numerical
+
+---
+
+# 3.7 Dataset Classification
+
+The dataset contains multiple categories of variables.
+
+## Identification Variables
+
+- report_id
+- drug_ndc_code
+- batch_id
+
+These uniquely identify reports and pharmaceutical products.
+
+---
+
+## Patient Variables
+
+- patient_age
+- patient_sex
+
+These describe demographic information.
+
+---
+
+## Drug Variables
+
+- drug_name
+- dose_amount_mg
+- route_of_administration
+- concomitant_medications
+- indication
+
+These describe drug exposure.
+
+---
+
+## Clinical Variables
+
+- adverse_event_term
+- event_seriousness
+- outcome
+- onset_date
+- causality_assessment
+
+These represent the patient's clinical condition.
+
+---
+
+## Reporting Variables
+
+- report_received_date
+- reporter_type
+- country
+
+These describe report origin and submission information.
+
+---
+
+## Manufacturing Variables
+
+- manufacturing_site
+- batch_id
+
+These assist quality investigations.
+
+---
+
+## Engineered Variables
+
+- is_missing_age
+- is_missing_dose
+- historical_ae_frequency
+
+These were generated during preprocessing to improve machine learning performance.
+
+---
+
+# 3.8 Dataset Used in the Project
+
+The project initially began with a pharmacovigilance dataset containing approximately **9,000 adverse drug event reports**.
+
+Large real-world healthcare datasets typically contain:
+
+- Duplicate records
+- Missing values
+- Inconsistent entries
+- Noisy observations
+- Invalid records
+- Incomplete reports
+
+Such issues reduce the effectiveness of machine learning models.
+
+Therefore, a comprehensive preprocessing pipeline was implemented to improve data quality.
+
+The preprocessing included:
+
+- Duplicate removal
+- Missing value treatment
+- Feature engineering
+- Data validation
+- Data standardization
+- Label encoding
+- Quality verification
+
+Following preprocessing, the cleaned dataset contained **81 high-quality records** that were selected for experimentation and model development.
+
+This curated dataset served as the foundation for all predictive models developed in PharmaVigil AI.
+
+---
+
+# 3.9 Why Dataset Cleaning Was Necessary
+
+Machine learning algorithms assume that the training data accurately represents the underlying problem.
+
+Raw healthcare datasets frequently contain inconsistencies that negatively affect model performance.
+
+The primary reasons for cleaning the dataset include:
+
+- Eliminating duplicate reports.
+- Correcting inconsistent formatting.
+- Handling missing values.
+- Removing invalid observations.
+- Improving prediction accuracy.
+- Reducing model bias.
+- Enhancing explainability.
+- Producing reliable evaluation metrics.
+
+Without preprocessing, model predictions may become unreliable and difficult to interpret.
+
+---
+
+# 3.10 Benefits of the Prepared Dataset
+
+The final curated dataset offers several advantages.
+
+### Improved Data Quality
+
+Noise and inconsistencies have been significantly reduced.
+
+---
+
+### Better Model Performance
+
+High-quality data enables machine learning algorithms to identify meaningful patterns.
+
+---
+
+### Reliable Predictions
+
+Predictions become more consistent and clinically meaningful.
+
+---
+
+### Improved Explainability
+
+SHAP explanations become easier to interpret because the input data is clean and standardized.
+
+---
+
+### Faster Training
+
+The curated dataset reduces computational complexity during model training and evaluation.
+
+---
+
+### Better Visualization
+
+Clean data produces clearer charts and more meaningful exploratory analyses.
+
+---
+
+# 3.11 Chapter Summary
+
+The pharmacovigilance dataset serves as the foundation of the PharmaVigil AI platform. The project began with approximately **9,000 raw adverse drug event reports**, which underwent an extensive preprocessing pipeline involving duplicate removal, missing value handling, feature engineering, validation, and standardization. The resulting **clean dataset of 81 high-quality records and 22 attributes** was used to train and evaluate the Classification, Causality Assessment, and Regression models.
+
+The dataset contains a diverse combination of demographic, clinical, pharmaceutical, reporting, manufacturing, and engineered features. This rich feature set enables the platform to perform seriousness prediction, causality assessment, adverse event trend forecasting, explainable AI analysis, and interactive visualization, making it well suited for intelligent pharmacovigilance applications.

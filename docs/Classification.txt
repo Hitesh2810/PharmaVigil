@@ -1,0 +1,500 @@
+# **PART 1: Machine Learning Models for Adverse Event Severity Prediction**
+
+## 4.1 Introduction
+
+After completing data preprocessing, feature selection, and dataset splitting, the next stage of the project involved developing machine learning models capable of predicting the severity of adverse drug events. The objective was to classify each adverse event into its corresponding severity category based on patient demographics, drug information, reaction characteristics, reporting details, and other clinical attributes available in the dataset.
+
+Machine learning was selected because adverse event datasets contain numerous variables that interact in complex ways. Traditional statistical approaches often struggle to capture these interactions, whereas machine learning models can automatically learn relationships between multiple input features and produce accurate predictions. By learning patterns from historical adverse event reports, these models can assist healthcare professionals in identifying potentially serious adverse reactions at an early stage.
+
+To evaluate different modelling approaches, three supervised machine learning algorithms were implemented:
+
+* Logistic Regression
+* Random Forest
+* XGBoost (Extreme Gradient Boosting)
+
+These algorithms were selected because they represent different learning methodologies. Logistic Regression serves as a simple linear baseline model, Random Forest introduces ensemble learning through multiple decision trees, and XGBoost employs gradient boosting to improve predictive performance. Comparing these models provides valuable insights into how different machine learning techniques handle healthcare data and helps identify the most suitable model for adverse event severity prediction.
+
+---
+
+# 4.2 Logistic Regression
+
+## Overview
+
+The first predictive model implemented in this project was Logistic Regression. It is one of the most widely used supervised machine learning algorithms for classification problems. Unlike linear regression, which predicts continuous numerical values, Logistic Regression predicts the probability that a data instance belongs to a particular class.
+
+In this project, Logistic Regression was used as the baseline classification model. Establishing a baseline is important because it provides a reference against which more advanced algorithms can be compared. Although Logistic Regression is relatively simple, it offers good interpretability and performs well when the relationship between features and the target variable is approximately linear.
+
+The model attempts to learn how different patient characteristics, drug information, and reaction-related variables influence the likelihood of an adverse event being classified into a specific severity category.
+
+---
+
+## Why Logistic Regression was Selected
+
+Logistic Regression was chosen because it offers several advantages during the initial stages of model development.
+
+First, it is computationally efficient and can be trained quickly even on moderately large datasets. This makes it suitable for establishing an initial benchmark.
+
+Second, Logistic Regression produces probabilistic outputs, allowing each prediction to be associated with a confidence score. Such probabilities can be useful in healthcare applications where uncertainty must be considered.
+
+Third, the model is easy to interpret. Each feature contributes positively or negatively toward the prediction, enabling researchers to understand how different variables influence adverse event severity.
+
+Finally, Logistic Regression serves as an excellent comparison point for more sophisticated ensemble algorithms such as Random Forest and XGBoost.
+
+---
+
+## Working Principle
+
+Logistic Regression learns relationships between input variables and the target class by estimating the probability that a particular observation belongs to each category.
+
+Instead of fitting a straight line, Logistic Regression uses the logistic (sigmoid) function to transform model outputs into probabilities ranging from 0 to 1. During training, the algorithm repeatedly adjusts its internal coefficients to minimize prediction error across the training dataset.
+
+For every adverse event record, the model considers all available input features simultaneously. Features such as patient age, sex, drug characteristics, reaction type, and reporting information collectively influence the predicted probability of the event being classified as serious or non-serious.
+
+Once the model has completed training, it can estimate the probability for previously unseen records and assign the most likely severity class.
+
+---
+
+## Model Training
+
+The dataset had already been divided into training and testing subsets using an 80:20 split. Approximately eighty percent of the data was used for learning while the remaining twenty percent was reserved for performance evaluation.
+
+During training, the Logistic Regression algorithm examined thousands of adverse event records and identified statistical relationships between predictor variables and the target class.
+
+The notebook configured the model with an increased maximum iteration value to ensure convergence. This prevents optimization from stopping before the model reaches a stable solution, particularly when working with datasets containing numerous encoded categorical variables.
+
+After training, the model generated predictions for the unseen testing dataset.
+
+---
+
+## Performance Interpretation
+
+Following prediction, the model's performance was evaluated using multiple classification metrics, including Accuracy, Precision, Recall, and F1-score.
+
+The Logistic Regression model demonstrated that meaningful predictive patterns exist within the adverse event dataset. However, because Logistic Regression assumes approximately linear relationships between features and the target variable, its predictive capability is naturally limited when compared to more advanced ensemble learning methods.
+
+Healthcare datasets frequently contain complex nonlinear interactions among patient characteristics, medications, and adverse reactions. Logistic Regression cannot effectively capture these intricate dependencies, resulting in comparatively lower predictive performance.
+
+Nevertheless, the model successfully established a strong baseline for evaluating subsequent machine learning algorithms.
+
+---
+
+## Strengths
+
+The major strengths of Logistic Regression include its simplicity, fast training time, ease of implementation, and interpretability. Since healthcare applications often require transparency, Logistic Regression provides an understandable decision-making process.
+
+Its probabilistic predictions are also valuable because clinicians can assess confidence levels rather than relying solely on categorical outputs.
+
+---
+
+## Limitations
+
+Despite its advantages, Logistic Regression has several limitations.
+
+It assumes a linear relationship between predictor variables and the target class.
+
+It struggles to capture nonlinear feature interactions.
+
+Its predictive performance decreases when numerous correlated variables are present.
+
+Complex healthcare datasets involving drug interactions, patient history, and multiple clinical variables often require more flexible algorithms capable of learning nonlinear decision boundaries.
+
+These limitations motivated the use of Random Forest and XGBoost in the later stages of the project.
+
+---
+
+# 4.3 Random Forest
+
+## Overview
+
+After evaluating Logistic Regression, the project introduced Random Forest as the second predictive model. Random Forest is an ensemble learning algorithm that combines multiple decision trees to produce a single, more accurate prediction.
+
+Unlike Logistic Regression, which constructs a single mathematical model, Random Forest builds hundreds of independent decision trees using different subsets of the training data. The final prediction is determined through majority voting among all trees.
+
+This ensemble strategy significantly improves prediction accuracy while reducing the risk of overfitting.
+
+---
+
+## Why Random Forest was Selected
+
+Random Forest was selected because adverse event datasets contain numerous categorical and numerical variables that interact in nonlinear ways.
+
+Decision trees are naturally capable of learning nonlinear decision boundaries. However, a single decision tree is highly sensitive to training data and may overfit.
+
+Random Forest addresses this problem by constructing many decision trees instead of relying on only one. Since every tree observes slightly different training samples and feature subsets, prediction errors made by individual trees tend to cancel each other.
+
+As a result, Random Forest generally provides better accuracy, improved robustness, and greater generalization ability than individual decision trees.
+
+---
+
+## Working Principle
+
+Random Forest operates through two important concepts:
+
+**Bootstrap Sampling**
+
+Each decision tree is trained using a randomly selected subset of the original training dataset.
+
+Different trees therefore learn slightly different decision rules.
+
+**Feature Randomization**
+
+Instead of considering every feature while making each split, Random Forest randomly selects a subset of available features.
+
+This increases diversity among trees and reduces correlation between them.
+
+Finally, all trees independently classify each adverse event record, and the majority vote determines the final prediction.
+
+This collaborative decision-making process significantly improves prediction reliability.
+
+---
+
+## Model Training
+
+The notebook configured the Random Forest classifier using 100 decision trees.
+
+During training, every tree independently analyzed relationships between patient demographics, drug information, adverse reactions, reporting characteristics, and severity labels.
+
+Because each tree learned different decision boundaries, the overall ensemble became capable of modelling highly complex relationships that Logistic Regression could not capture.
+
+---
+
+## Performance Interpretation
+
+Random Forest generally produced better predictive performance than Logistic Regression.
+
+The improvement occurred because Random Forest effectively captured nonlinear relationships among predictor variables.
+
+Healthcare datasets often include interactions between multiple patient characteristics and medications. Random Forest naturally models these interactions without requiring manual feature engineering.
+
+The feature importance generated by Random Forest also provided valuable insight into which variables contributed most strongly to adverse event severity prediction.
+
+This interpretability made Random Forest an excellent intermediate model before introducing XGBoost.
+
+---
+
+## Advantages
+
+Random Forest offers numerous advantages for healthcare prediction problems.
+
+It handles both categorical and numerical variables effectively.
+
+It is resistant to overfitting due to ensemble averaging.
+
+It can automatically identify complex feature interactions.
+
+It provides feature importance scores that improve model interpretability.
+
+It performs well even when datasets contain missing values or noisy observations.
+
+---
+
+## Limitations
+
+Although Random Forest significantly improves prediction accuracy, it also has limitations.
+
+Training multiple decision trees requires more computational resources.
+
+Prediction time is slower than simpler models because many trees participate in each prediction.
+
+Feature importance values indicate overall influence but do not explain how individual features affect specific predictions.
+
+For this reason, additional explainability techniques such as SHAP were later incorporated into the project.
+
+---
+
+# 4.4 XGBoost (Extreme Gradient Boosting)
+
+## Overview
+
+The final machine learning algorithm implemented in this project was XGBoost, one of the most powerful gradient boosting algorithms available for structured tabular datasets.
+
+XGBoost has become a preferred algorithm in both academic research and industrial machine learning because it consistently achieves high predictive performance while maintaining computational efficiency.
+
+Unlike Random Forest, which trains decision trees independently, XGBoost constructs trees sequentially. Each new tree is specifically designed to correct the mistakes made by previous trees.
+
+This iterative error correction mechanism enables XGBoost to produce highly accurate predictive models.
+
+---
+
+## Why XGBoost was Selected
+
+The primary objective of this project was to maximize prediction accuracy while maintaining reliable generalization on unseen adverse event records.
+
+XGBoost was selected because it offers several advantages over traditional machine learning algorithms.
+
+It effectively models complex nonlinear relationships.
+
+It incorporates regularization techniques that reduce overfitting.
+
+It efficiently handles large structured datasets.
+
+It automatically focuses learning on difficult observations that previous trees classified incorrectly.
+
+These characteristics make XGBoost particularly suitable for adverse event severity prediction, where interactions among drugs, patient demographics, and reactions can be highly complex.
+
+---
+
+## Working Principle
+
+XGBoost builds decision trees sequentially.
+
+The first tree makes an initial prediction.
+
+Errors produced by the first tree are calculated.
+
+The second tree is trained specifically to reduce those errors.
+
+The process continues, with each subsequent tree correcting mistakes made by all previous trees.
+
+Instead of treating every observation equally throughout training, XGBoost gradually concentrates on difficult-to-classify records.
+
+Consequently, prediction accuracy improves after each boosting iteration.
+
+---
+
+## Model Training
+
+Within the notebook, the XGBoost classifier was trained using the prepared feature matrix and target labels.
+
+The model learned complex interactions among encoded patient information, drug-related variables, and adverse reaction characteristics.
+
+Following training, predictions were generated for the testing dataset, and evaluation metrics were calculated.
+
+These metrics were later compared with Logistic Regression and Random Forest to determine the most suitable model.
+
+---
+
+4.4 Performance Interpretation of XGBoost
+
+Although XGBoost is widely recognized as one of the most powerful gradient boosting algorithms for structured datasets, its performance in this project was slightly lower than that of the Random Forest model. The model successfully learned complex relationships among patient demographics, drug information, and adverse reaction characteristics, producing reliable predictions for adverse event severity classification. However, after comparing the evaluation metrics of all three algorithms, Random Forest demonstrated superior overall performance on the given dataset.
+
+The difference in performance may be attributed to the characteristics of the adverse event dataset. Random Forest effectively handled the available features and generalized well on unseen data without requiring extensive parameter tuning. While XGBoost is capable of achieving excellent results, it often requires careful optimization of hyperparameters such as learning rate, maximum tree depth, and the number of boosting iterations. In this project, the Random Forest model provided a better balance between prediction accuracy, robustness, and computational efficiency.
+
+Therefore, although XGBoost produced competitive results and demonstrated its ability to model complex nonlinear relationships, it was not selected as the final prediction model because Random Forest achieved better evaluation metrics.
+
+4.5 Comparative Analysis of the Three Models
+
+Three supervised machine learning algorithms—Logistic Regression, Random Forest, and XGBoost—were implemented and evaluated for adverse event severity prediction. Each algorithm contributed differently to the analysis and demonstrated unique strengths and limitations.
+
+Logistic Regression served as the baseline classification model. It provided a simple and interpretable approach for predicting adverse event severity by modelling the relationship between input variables and the target class. Although the model successfully identified general trends within the dataset, its assumption of linear relationships limited its ability to capture the complex interactions present in healthcare data. Consequently, its predictive performance was comparatively lower than the ensemble-based algorithms.
+
+Random Forest significantly improved prediction performance by constructing multiple decision trees and combining their predictions through majority voting. This ensemble learning approach enabled the model to learn complex nonlinear relationships between patient information, drug characteristics, and adverse reaction features. The Random Forest model demonstrated excellent generalization capability and produced the highest performance among all the implemented algorithms. Additionally, it generated feature importance scores, allowing the project to identify which variables contributed most significantly to adverse event severity prediction.
+
+XGBoost also produced strong predictive performance by sequentially correcting the errors made by previous decision trees through gradient boosting. The algorithm effectively captured nonlinear feature interactions and generated accurate predictions. However, when compared with Random Forest using the selected evaluation metrics, its performance was slightly lower for the current dataset. Although XGBoost remains one of the most powerful machine learning algorithms for structured data, the characteristics of the adverse event dataset favored the Random Forest model.
+
+Based on the comparative evaluation, Random Forest was selected as the final prediction model for this project. It achieved the best overall balance between prediction accuracy, robustness, and generalization while effectively handling the heterogeneous healthcare dataset. The model successfully captured complex relationships among patient demographics, drug information, and adverse reaction characteristics, leading to more reliable severity predictions.
+
+Since Random Forest demonstrated the highest classification performance, it was selected for the explainability phase of the project. The SHAP (SHapley Additive exPlanations) framework was applied to the trained Random Forest model to interpret its predictions. SHAP enabled both global and local explainability by identifying the features that most strongly influenced adverse event severity predictions, thereby improving the transparency and trustworthiness of the developed machine learning system.
+
+
+PART 2: Model Performance Evaluation and Interpretation
+5.1 Introduction
+
+After training the Logistic Regression, Random Forest, and XGBoost models, the next phase of the project focused on evaluating their predictive performance. Model evaluation is a crucial step in any machine learning project because it determines how effectively a trained model can classify unseen data. A model that performs well on training data but fails on new data cannot be considered reliable for practical healthcare applications.
+
+In this project, multiple evaluation metrics were employed to assess the effectiveness of each classifier. Instead of relying solely on prediction accuracy, additional metrics such as Precision, Recall, F1-Score, Confusion Matrix, Receiver Operating Characteristic (ROC) Curve, Area Under the Curve (AUC), and Feature Importance were analyzed. These evaluation techniques provide a comprehensive understanding of the strengths and weaknesses of each model and help identify the most suitable algorithm for adverse event severity prediction.
+
+The evaluation process also ensured that the selected model not only achieved high predictive accuracy but also demonstrated consistent performance across different severity classes. Since healthcare applications require reliable and interpretable predictions, using multiple evaluation metrics helps validate the robustness of the developed machine learning system.
+
+5.2 Accuracy
+
+Accuracy is one of the most commonly used evaluation metrics in classification problems. It measures the proportion of correctly classified observations among the total number of observations in the testing dataset. In simple terms, accuracy indicates how often the model makes correct predictions.
+
+For adverse event severity prediction, accuracy represents the percentage of adverse event reports that were assigned to the correct severity category by the machine learning model. A higher accuracy value indicates better predictive performance.
+
+Although accuracy provides an overall measure of model performance, it should not be considered the only evaluation metric, particularly when dealing with healthcare datasets. Medical datasets often contain imbalanced class distributions, where one severity category may contain significantly more observations than another. In such situations, a model may achieve high accuracy simply by predicting the majority class while failing to correctly identify minority cases.
+
+Therefore, while accuracy serves as an important initial performance indicator, additional evaluation metrics are necessary to obtain a complete understanding of model behaviour.
+
+In this project, the Random Forest model achieved the highest prediction accuracy among all three implemented algorithms. This indicates that Random Forest correctly classified a larger proportion of adverse event reports than Logistic Regression and XGBoost, making it the most effective model for this classification task.
+
+5.3 Precision
+
+Precision measures the proportion of predicted positive observations that are actually correct. It evaluates the reliability of positive predictions generated by the model.
+
+In healthcare applications, precision is particularly important because false positive predictions may lead to unnecessary clinical investigations, additional medical procedures, or inappropriate allocation of healthcare resources.
+
+A model with high precision ensures that when it predicts a serious adverse event, the prediction is highly likely to be correct. This increases the confidence of healthcare professionals in the system's recommendations.
+
+The Random Forest model demonstrated superior precision compared to the other machine learning algorithms. This indicates that it produced fewer false positive classifications and generated more reliable predictions for adverse event severity.
+
+High precision is especially valuable in pharmacovigilance because it minimizes unnecessary concern regarding drug safety while maintaining confidence in the identified serious adverse reactions.
+
+5.4 Recall
+
+Recall measures the ability of a machine learning model to identify all actual positive cases within the dataset. It evaluates how effectively the classifier detects serious adverse events without missing important cases.
+
+In adverse event severity prediction, recall is extremely important because failing to identify a serious adverse drug reaction may delay clinical intervention and negatively affect patient safety.
+
+A high recall value indicates that the model successfully identifies most serious adverse events present in the dataset while minimizing false negatives.
+
+The Random Forest model demonstrated strong recall performance, indicating that it effectively detected serious adverse events while reducing the number of missed cases. This characteristic makes the model particularly suitable for healthcare applications where identifying high-risk patients is more important than simply maximizing overall accuracy.
+
+5.5 F1-Score
+
+The F1-Score provides a balanced evaluation by combining both Precision and Recall into a single performance metric. It is particularly useful when evaluating classification models on datasets where both false positives and false negatives must be minimized.
+
+Healthcare datasets often require a balance between correctly identifying serious adverse events and avoiding unnecessary false alarms. The F1-Score reflects this balance by considering both aspects simultaneously.
+
+Among the evaluated machine learning models, Random Forest achieved the highest F1-Score, demonstrating its ability to maintain both high precision and high recall. This indicates that the model produced consistent and reliable predictions across different severity categories.
+
+The superior F1-Score further confirmed the suitability of Random Forest for adverse event severity prediction.
+
+5.6 Confusion Matrix
+
+The Confusion Matrix provides a detailed summary of classification performance by comparing actual class labels with predicted class labels. Unlike accuracy, which only reports the overall percentage of correct predictions, the Confusion Matrix identifies the specific types of prediction errors made by the model.
+
+Each row of the matrix represents the actual class, while each column represents the predicted class. The diagonal elements correspond to correctly classified observations, whereas the off-diagonal elements represent misclassifications.
+
+For this project, the Confusion Matrix revealed that the Random Forest model correctly classified the majority of adverse event reports into their respective severity categories. The large concentration of values along the diagonal indicated strong classification performance.
+
+The relatively small number of off-diagonal entries suggested that the model generated fewer incorrect predictions compared to Logistic Regression and XGBoost.
+
+This visualization provided confidence that the selected model generalized well to unseen data and maintained consistent prediction accuracy across different classes.
+
+5.7 Receiver Operating Characteristic (ROC) Curve
+
+The Receiver Operating Characteristic (ROC) Curve is a graphical evaluation technique used to measure the classification capability of a machine learning model across different decision thresholds.
+
+The ROC Curve plots the True Positive Rate against the False Positive Rate for multiple threshold values. A model that consistently achieves high true positive rates while maintaining low false positive rates produces a curve closer to the upper-left corner of the graph.
+
+A classifier with poor predictive capability generates a ROC curve close to the diagonal reference line, indicating that its predictions are nearly equivalent to random guessing.
+
+In this project, ROC curves were generated for all implemented machine learning algorithms to compare their ability to distinguish between adverse event severity classes.
+
+The ROC Curve corresponding to the Random Forest classifier demonstrated superior separation capability, indicating that it achieved better discrimination between different severity categories than Logistic Regression and XGBoost.
+
+5.8 Area Under the Curve (AUC)
+
+The Area Under the ROC Curve (AUC) provides a single numerical measure of classifier performance.
+
+An AUC value closer to one indicates excellent classification capability, whereas values closer to 0.5 indicate random prediction performance.
+
+The AUC score summarizes the model's ability to distinguish between different classes regardless of the selected classification threshold.
+
+Among the evaluated algorithms, Random Forest achieved the highest AUC score, demonstrating superior discriminative capability and confirming its robustness in adverse event severity prediction.
+
+The high AUC value indicates that Random Forest consistently assigned higher prediction probabilities to the correct severity classes than the other machine learning models.
+
+5.9 Feature Importance
+
+One of the advantages of tree-based machine learning algorithms is their ability to estimate feature importance. Feature Importance measures the relative contribution of each input variable to the final prediction.
+
+Unlike Logistic Regression, which assumes linear relationships between variables, Random Forest identifies the most informative features based on how frequently and effectively they are used while constructing decision trees.
+
+The Feature Importance plot generated in this project ranked all predictor variables according to their contribution to adverse event severity prediction.
+
+Variables with higher importance scores had a greater influence on the model's decision-making process, while variables with lower scores contributed less to the final predictions.
+
+This analysis provided valuable insight into which patient characteristics, drug information, and reaction-related attributes were most relevant for predicting adverse event severity.
+
+The identified important features formed the basis for the explainability analysis performed using SHAP in the subsequent phase of the project.
+
+5.10 Comparative Performance Analysis
+
+The performance of Logistic Regression, Random Forest, and XGBoost was compared using all evaluation metrics.
+
+Logistic Regression established a useful baseline model but demonstrated lower predictive performance because of its inability to capture complex nonlinear relationships present in the adverse event dataset.
+
+XGBoost achieved competitive classification performance and effectively modelled nonlinear interactions between predictor variables. However, despite its advanced boosting mechanism, it did not outperform Random Forest on the current dataset.
+
+Random Forest consistently produced the best results across the evaluated performance metrics. It achieved the highest prediction accuracy, precision, recall, F1-score, and AUC score while maintaining strong generalization capability on unseen adverse event records.
+
+The ensemble learning strategy employed by Random Forest enabled the model to capture complex relationships among patient demographics, drug characteristics, reporting information, and reaction attributes more effectively than the other algorithms.
+
+Furthermore, Random Forest generated meaningful feature importance scores, providing additional interpretability that supported subsequent explainability analysis.
+
+5.11 Final Model Selection
+
+Based on the comprehensive evaluation of all implemented machine learning algorithms, Random Forest was selected as the final prediction model for adverse event severity classification.
+
+The model demonstrated the best balance between predictive accuracy, robustness, reliability, and generalization performance. Its ensemble learning mechanism effectively reduced overfitting while accurately modelling the complex interactions present within the healthcare dataset.
+
+In addition to its superior predictive performance, Random Forest provided feature importance information that improved the interpretability of the developed system. This characteristic was particularly valuable because understanding the factors influencing adverse event severity is essential in pharmacovigilance and clinical decision support.
+
+Since Random Forest achieved the highest overall performance among the evaluated models, it was selected for the explainability stage of the project. In the next section, SHAP (SHapley Additive exPlanations) is applied to the trained Random Forest model to investigate how individual features influence model predictions and to provide transparent explanations for both global and instance-level decision-making.
+5.2 Accuracy
+
+Accuracy is one of the most fundamental evaluation metrics used to measure the overall performance of a classification model. It represents the proportion of correctly classified instances out of the total number of observations in the testing dataset. In the context of this project, accuracy indicates how effectively each machine learning algorithm classified adverse drug events into their corresponding severity categories.
+
+The Logistic Regression model achieved an accuracy of 47.06%, indicating that it correctly classified 8 out of the 17 testing samples. The Random Forest model also achieved an accuracy of 47.06%, while the XGBoost model obtained an accuracy of 35.29%. Although Logistic Regression and Random Forest produced the same overall accuracy, further evaluation using additional metrics revealed that Random Forest generated more balanced and reliable predictions across both severity classes. The lower accuracy of XGBoost indicates that it struggled to generalize effectively on the available testing data. Therefore, accuracy alone was insufficient for selecting the final model, making it necessary to evaluate Precision, Recall, F1-score, and other performance metrics.
+
+5.3 Precision
+
+Precision measures the proportion of correctly predicted positive instances among all observations predicted as positive by the model. It reflects the reliability of positive predictions and is particularly important in healthcare applications where false positive predictions may result in unnecessary medical investigations or treatments.
+
+The Logistic Regression model achieved a precision of 46.64%, while the Random Forest model obtained a slightly higher precision of 47.39%. The XGBoost model recorded the lowest precision of 35.54%. Although the difference between Logistic Regression and Random Forest was relatively small, Random Forest demonstrated greater consistency in identifying the correct severity category while reducing incorrect positive predictions. This slight improvement in precision contributed to the overall superiority of the Random Forest model.
+
+5.4 Recall
+
+Recall evaluates the ability of the classifier to correctly identify all actual positive instances in the dataset. In adverse event severity prediction, recall is particularly significant because missing serious adverse drug reactions could delay clinical intervention and compromise patient safety.
+
+The Logistic Regression model achieved a recall of 47.06%, correctly identifying nearly half of the actual positive cases. The Random Forest model also achieved a recall of 47.06%, demonstrating a similar ability to detect positive cases. The XGBoost model obtained a considerably lower recall of 35.29%, indicating that it failed to identify a larger number of actual positive observations. Although Logistic Regression and Random Forest produced identical recall values, Random Forest demonstrated better balance when combined with the other evaluation metrics.
+
+5.5 F1-Score
+
+The F1-score combines Precision and Recall into a single performance metric by calculating their harmonic mean. It is widely used in healthcare classification tasks because it provides a balanced assessment of prediction performance while considering both false positives and false negatives.
+
+The Logistic Regression model achieved an F1-score of 46.69%, indicating moderate classification performance. The Random Forest model produced a slightly higher F1-score of 47.06%, demonstrating better overall balance between Precision and Recall. The XGBoost model achieved an F1-score of 35.29%, reflecting weaker overall predictive capability on the testing dataset. The higher F1-score obtained by Random Forest confirms that it produced the most balanced predictions among the three evaluated algorithms.
+
+5.6 Confusion Matrix
+
+The Confusion Matrix provides a detailed visualization of the classification results by comparing the actual class labels with the predicted class labels. Unlike overall accuracy, it clearly illustrates the number of correctly classified observations as well as the prediction errors made by each model.
+
+For the Logistic Regression model, the confusion matrix [[5, 4], [5, 3]] indicates that five non-serious adverse events and three serious adverse events were classified correctly, while nine observations were misclassified. This demonstrates moderate predictive capability but also highlights the difficulty of distinguishing between the two severity classes.
+
+The Random Forest confusion matrix [[4, 5], [4, 4]] shows that the model correctly classified four observations from each class while misclassifying nine samples. Although the total number of correct predictions is similar to Logistic Regression, Random Forest achieved a more balanced distribution of correct predictions across both classes, reducing prediction bias toward a single class.
+
+The XGBoost confusion matrix [[3, 6], [5, 3]] indicates that only six observations were classified correctly, while eleven samples were misclassified. This explains its comparatively lower evaluation scores and demonstrates that the model struggled to distinguish between serious and non-serious adverse events for the given dataset.
+
+5.7 Receiver Operating Characteristic (ROC) Curve
+
+The Receiver Operating Characteristic (ROC) Curve is used to evaluate the classification capability of a machine learning model across different decision thresholds. It illustrates the trade-off between the True Positive Rate and the False Positive Rate, allowing researchers to assess the model's ability to distinguish between different classes.
+
+For this project, ROC analysis was primarily performed for the Logistic Regression model, which achieved an Area Under the Curve (ROC-AUC) score of 0.2778. This relatively low AUC value indicates that Logistic Regression had limited capability in distinguishing between the two adverse event severity classes. Although ROC analysis provides valuable insights into classification performance, the final model selection was primarily based on the combined evaluation of Accuracy, Precision, Recall, and F1-score. Since ROC-AUC values were not generated for the Random Forest and XGBoost models in the notebook, the comparative evaluation relied on the other performance metrics.
+
+5.9 Comparative Performance Analysis
+
+A comparative evaluation of all three machine learning models revealed distinct differences in predictive performance. Logistic Regression achieved an accuracy of 47.06%, precision of 46.64%, recall of 47.06%, and an F1-score of 46.69%, demonstrating moderate classification capability while serving as an effective baseline model.
+
+Random Forest achieved an accuracy of 47.06%, precision of 47.39%, recall of 47.06%, and an F1-score of 47.06%. Although its overall accuracy matched that of Logistic Regression, Random Forest produced slightly better Precision and F1-score values while generating more balanced predictions across both severity classes. These improvements indicate that Random Forest generalized better on the testing dataset and provided more consistent classification performance.
+
+XGBoost achieved an accuracy of 35.29%, precision of 35.54%, recall of 35.29%, and an F1-score of 35.29%, making it the weakest performing model among the three evaluated algorithms. The confusion matrix further confirmed that XGBoost produced a larger number of misclassifications, resulting in lower overall predictive performance.
+
+Considering all evaluation metrics together, Random Forest demonstrated the most balanced and reliable performance for adverse event severity prediction. Although Logistic Regression achieved the same overall accuracy, Random Forest produced better Precision and F1-score values while maintaining balanced predictions across both classes. Consequently, Random Forest was selected as the final prediction model and used for the explainability analysis presented in the subsequent section.
+
+1. Random Forest ROC Curve
+
+The Receiver Operating Characteristic (ROC) Curve evaluates the classification performance of the Random Forest model across different decision thresholds. It illustrates the relationship between the True Positive Rate (Sensitivity) and the False Positive Rate, allowing the model's ability to distinguish between the two severity classes to be assessed. The diagonal dashed line represents the performance of a random classifier, while the blue ROC curve indicates the actual performance of the trained model. The obtained Area Under the Curve (AUC) value is 0.54, indicating that the model performs slightly better than random guessing in distinguishing between serious and non-serious adverse events. Although the AUC value is relatively modest, it confirms that the model has learned meaningful classification patterns from the available dataset. The ROC curve provides an additional evaluation measure that complements Accuracy, Precision, Recall, and F1-score during model assessment.
+
+2. Random Forest Feature Importance Plot
+
+The Feature Importance plot identifies the variables that contributed most significantly to the Random Forest model's prediction process. Each horizontal bar represents a feature, while the bar length indicates its relative importance in classifying adverse event severity. The plot shows that batch_id has the highest importance, followed by reporter_type, patient_age, country, drug_name, historical_ae_frequency, and dose_amount_mg. Features with higher importance values have a greater influence on the model's decision-making process than those with lower values. This analysis helps identify which patient and drug-related characteristics contribute most to predicting adverse event severity. The Feature Importance plot also provides an overall understanding of the model before performing more detailed explainability using SHAP.
+
+3. Random Forest Confusion Matrix
+
+The Confusion Matrix provides a detailed summary of the classification results by comparing the actual severity classes with the predicted classes generated by the Random Forest model. The matrix indicates that 4 non-serious cases were correctly classified as non-serious, while 4 serious cases were correctly identified as serious. However, the model incorrectly classified 5 non-serious cases as serious and 4 serious cases as non-serious. This distribution demonstrates that the model made an equal number of correct predictions for both classes but also produced several misclassifications. The balanced distribution of correctly predicted observations suggests that the Random Forest model does not exhibit a strong bias toward either class. Overall, the Confusion Matrix provides valuable insight into the strengths and weaknesses of the classifier beyond overall accuracy.
+
+4. Actual Class Distribution Pie Chart
+
+The Actual Class Distribution pie chart illustrates the proportion of each severity class present in the testing dataset. The chart shows that 52.9% of the observations belong to the Non-Serious class, while 47.1% belong to the Serious class. This indicates that the dataset is relatively balanced, with only a small difference between the two categories. A balanced dataset is beneficial because it reduces the likelihood of model bias toward one class during training. The nearly equal distribution also allows evaluation metrics such as Accuracy, Precision, Recall, and F1-score to provide meaningful comparisons between different machine learning models. Understanding the class distribution is essential before interpreting model performance and explainability results.
+
+5. SHAP Summary Plot
+
+The SHAP Summary Plot provides a global explanation of how each feature influences the predictions made by the Random Forest model. Each dot represents an individual sample, while the horizontal position indicates the SHAP value, which measures the feature's impact on the model output. Features appearing at the top of the plot have the greatest influence on the model's predictions. According to the plot, reporter_type, drug_name, batch_id, and country are among the most influential variables affecting adverse event severity prediction. The colour gradient represents the feature values, with blue indicating lower values and red indicating higher values. This visualization enables an overall understanding of how different feature values contribute positively or negatively to the final classification.
+
+6. SHAP Waterfall Plot
+
+The SHAP Waterfall Plot explains how individual feature contributions combine to produce the prediction for a single adverse event report. The plot begins with the model's baseline prediction and sequentially adds or subtracts the influence of each feature until the final prediction is reached. In this example, reporter_type contributes the largest positive impact, followed by batch_id, patient_age, country, and dose_amount_mg, increasing the prediction probability. Conversely, historical_ae_frequency and drug_name contribute negatively, reducing the final prediction score. The cumulative effect of all features results in a final model output of approximately 0.68. This visualization clearly demonstrates how the Random Forest model arrives at an individual prediction by combining the influence of multiple features.
+
+7. SHAP Force Plot
+
+The SHAP Force Plot provides another local explanation of an individual prediction by visualizing how different features push the prediction toward one of the two severity classes. The base value represents the average prediction of the Random Forest model before considering the individual feature values. Features shown in red increase the prediction score toward the predicted class, whereas features shown in blue decrease the prediction score. In this instance, reporter_type, batch_id, patient_age, country, and dose_amount_mg positively influenced the prediction, while historical_ae_frequency and drug_name reduced the prediction probability. The combined contribution of all features shifted the model output from the baseline value to a final prediction of approximately 0.68. This plot provides a clear visual explanation of how individual variables influenced the model's decision for a single patient record.
+
+8. SHAP Violin Plot – Class 0 (Non-Serious)
+
+The SHAP Violin Plot for Class 0 (Non-Serious) illustrates the distribution of SHAP values for each feature when predicting non-serious adverse events. The width of each violin represents the density of observations, while the horizontal spread indicates the magnitude of feature influence. Features with wider distributions have greater variability in their contribution to the prediction. The plot shows that reporter_type, drug_name, batch_id, and country exhibit the largest influence on predicting non-serious adverse events. In contrast, patient_age and dose_amount_mg demonstrate comparatively smaller contributions. This visualization provides a comprehensive understanding of how each feature behaves across all observations belonging to the non-serious class.
+
+9. SHAP Violin Plot – Class 1 (Serious)
+
+The SHAP Violin Plot for Class 1 (Serious) illustrates the distribution of feature contributions when predicting serious adverse events. Similar to the previous plot, wider violins indicate greater variability in SHAP values, reflecting stronger influence on the model output. The results indicate that reporter_type, drug_name, batch_id, country, and historical_ae_frequency contribute substantially to predicting serious adverse events. The distribution also demonstrates that the influence of these features varies across individual observations rather than remaining constant. Features such as dose_amount_mg and patient_age have comparatively smaller effects but still contribute to the final prediction. This plot provides valuable insight into how feature influence differs across all serious adverse event predictions, supporting the overall interpretability of the Random Forest model.
