@@ -8,6 +8,7 @@ import Visualizations from '@/pages/Visualizations';
 import ModelVisualization from '@/pages/ModelVisualization';
 import About from '@/pages/About';
 import Contact from '@/pages/Contact';
+import LiveShapAnalyzer from '@/pages/LiveShapAnalyzer';
 
 export default function App() {
   const location = useLocation();
@@ -21,6 +22,7 @@ export default function App() {
           <Route path="/visualization/:kind" element={<PageTransition><ModelVisualization /></PageTransition>} />
           <Route path="/about" element={<PageTransition><About /></PageTransition>} />
           <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
+          <Route path="/live-shap" element={<PageTransition><LiveShapAnalyzer /></PageTransition>} />
         </Routes>
       </AnimatePresence>
     </Layout>

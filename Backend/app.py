@@ -12,6 +12,7 @@ from routes.dashboard import dashboard_bp
 from routes.chatbot import chatbot_bp
 from routes.shap import shap_bp
 from routes.visualization import visualization_bp
+from routes.live_shap import live_shap_bp
 
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(name)s %(message)s')
@@ -27,6 +28,7 @@ app.register_blueprint(dashboard_bp, url_prefix='/api')
 app.register_blueprint(chatbot_bp, url_prefix='/api')
 app.register_blueprint(shap_bp, url_prefix='/api')
 app.register_blueprint(visualization_bp, url_prefix='/api')
+app.register_blueprint(live_shap_bp, url_prefix='/api')
 
 
 @app.errorhandler(404)

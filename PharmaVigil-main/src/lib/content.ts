@@ -7,6 +7,7 @@ export const navLinks: NavLink[] = [
   { label: 'Home', to: '/' },
   { label: 'AI Chatbot', to: '/chatbot' },
   { label: 'Visualizations', to: '/visualizations' },
+  { label: 'Live SHAP Analyzer', to: '/live-shap' },
   { label: 'About Us', to: '/about' },
   { label: 'Contact', to: '/contact' },
 ];
