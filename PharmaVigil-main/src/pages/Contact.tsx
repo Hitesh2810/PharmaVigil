@@ -23,11 +23,11 @@ interface FormValues {
 }
 
 const contactInfo = [
-  { icon: Mail, label: 'Email', value: 'contact@pharmavigil.ai', href: 'mailto:contact@pharmavigil.ai' },
-  { icon: Phone, label: 'Phone', value: '+91 98765 43210', href: 'tel:+919876543210' },
-  { icon: MapPin, label: 'Location', value: 'Department of Computer Science, India', href: null },
-  { icon: Linkedin, label: 'LinkedIn', value: 'linkedin.com/in/pharmavigil', href: 'https://linkedin.com' },
-  { icon: Github, label: 'GitHub', value: 'github.com/pharmavigil', href: 'https://github.com' },
+  { icon: Mail, label: 'Email', value: 'hiteshkumarsairam@gmail.com', href: 'mailto:hiteshkumarsairam@gmail.com' },
+  { icon: Phone, label: 'Phone', value: '7339228840', href: 'tel:+917339228840' },
+  { icon: MapPin, label: 'Location', value: 'Hosur', href: null },
+  { icon: Linkedin, label: 'LinkedIn', value: 'linkedin.com/in/hiteshkumars', href: 'https://www.linkedin.com/in/hiteshkumars/' },
+  { icon: Github, label: 'GitHub', value: 'github.com/Hitesh2810', href: 'https://github.com/Hitesh2810' },
 ];
 
 const faqs = [

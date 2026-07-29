@@ -4,9 +4,9 @@ import { Activity, Github, Linkedin, Mail, ArrowUpRight } from 'lucide-react';
 import { navLinks } from '@/lib/content';
 
 const socials = [
-  { label: 'GitHub', href: 'https://github.com', icon: Github },
-  { label: 'LinkedIn', href: 'https://linkedin.com', icon: Linkedin },
-  { label: 'Email', href: 'mailto:contact@pharmavigil.ai', icon: Mail },
+  { label: 'GitHub', href: 'https://github.com/Hitesh2810', icon: Github },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/hiteshkumars/', icon: Linkedin },
+  { label: 'Email', href: 'mailto:hiteshkumarsairam@gmail.com', icon: Mail },
 ];
 
 export function Footer() {
@@ -66,11 +66,11 @@ export function Footer() {
             <h4 className="text-sm font-semibold text-white">Contact</h4>
             <ul className="mt-4 space-y-2.5 text-sm text-muted">
               <li>
-                <a href="mailto:contact@pharmavigil.ai" className="hover:text-white">
-                  contact@pharmavigil.ai
+                <a href="mailto:hiteshkumarsairam@gmail.com" className="hover:text-white">
+                  hiteshkumarsairam@gmail.com
                 </a>
               </li>
-              <li>Department of Computer Science</li>
+              <li>Hosur</li>
               <li>Final Year B.Tech Capstone</li>
             </ul>
           </div>

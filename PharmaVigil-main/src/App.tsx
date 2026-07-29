@@ -6,6 +6,7 @@ import Home from '@/pages/Home';
 import Chatbot from '@/pages/Chatbot';
 import Visualizations from '@/pages/Visualizations';
 import ModelVisualization from '@/pages/ModelVisualization';
+import ModelComparison from '@/pages/ModelComparison';
 import About from '@/pages/About';
 import Contact from '@/pages/Contact';
 import LiveShapAnalyzer from '@/pages/LiveShapAnalyzer';
@@ -20,6 +21,7 @@ export default function App() {
           <Route path="/chatbot" element={<PageTransition><Chatbot /></PageTransition>} />
           <Route path="/visualizations" element={<PageTransition><Visualizations /></PageTransition>} />
           <Route path="/visualization/:kind" element={<PageTransition><ModelVisualization /></PageTransition>} />
+          <Route path="/model-comparison" element={<PageTransition><ModelComparison /></PageTransition>} />
           <Route path="/about" element={<PageTransition><About /></PageTransition>} />
           <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
           <Route path="/live-shap" element={<PageTransition><LiveShapAnalyzer /></PageTransition>} />

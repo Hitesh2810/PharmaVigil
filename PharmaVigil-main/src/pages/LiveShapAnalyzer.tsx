@@ -123,12 +123,12 @@ export default function LiveShapAnalyzer() {
           ...chartLayoutDefaults,
           title: 'Global mean |SHAP| importance',
           margin: { l: 180, r: 24, t: 40, b: 40 },
-          height: 520,
+          height: 440,
           xaxis: { title: 'Mean |SHAP|', tickfont: { color: '#cbd5e1' } },
           yaxis: { automargin: true, tickfont: { color: '#cbd5e1' } },
         }}
         useResizeHandler
-        style={{ width: '100%', minHeight: 520 }}
+        style={{ width: '100%', minHeight: 440 }}
       />
     );
   }, [report]);
@@ -151,12 +151,12 @@ export default function LiveShapAnalyzer() {
           ...chartLayoutDefaults,
           title: 'SHAP heatmap across all samples',
           margin: { l: 120, r: 24, t: 40, b: 120 },
-          height: 520,
+          height: 440,
           xaxis: { tickangle: -45, tickfont: { color: '#cbd5e1' } },
           yaxis: { automargin: true, tickfont: { color: '#cbd5e1' } },
         }}
         useResizeHandler
-        style={{ width: '100%', minHeight: 520 }}
+        style={{ width: '100%', minHeight: 440 }}
       />
     );
   }, [normalizedFeatureNames, shapMatrix]);
@@ -179,12 +179,12 @@ export default function LiveShapAnalyzer() {
           ...chartLayoutDefaults,
           title: `Top feature contributions for sample ${selectedSample + 1}`,
           margin: { l: 120, r: 24, t: 40, b: 120 },
-          height: 520,
+          height: 440,
           xaxis: { tickangle: -45, tickfont: { color: '#cbd5e1' } },
           yaxis: { title: 'SHAP value', tickfont: { color: '#cbd5e1' } },
         }}
         useResizeHandler
-        style={{ width: '100%', minHeight: 520 }}
+        style={{ width: '100%', minHeight: 440 }}
       />
     );
   }, [normalizedFeatureNames, shapMatrix, selectedSample, featureValues]);
@@ -208,12 +208,12 @@ export default function LiveShapAnalyzer() {
           ...chartLayoutDefaults,
           title: `Dependence plot for ${selectedFeature}`,
           margin: { l: 80, r: 24, t: 40, b: 120 },
-          height: 520,
+          height: 440,
           xaxis: { title: `${selectedFeature} value`, tickangle: -45, tickfont: { color: '#cbd5e1' } },
           yaxis: { title: 'SHAP value', tickfont: { color: '#cbd5e1' } },
         }}
         useResizeHandler
-        style={{ width: '100%', minHeight: 520 }}
+        style={{ width: '100%', minHeight: 440 }}
       />
     );
   }, [normalizedFeatureNames, shapMatrix, featureValues, selectedFeature]);
@@ -240,12 +240,12 @@ export default function LiveShapAnalyzer() {
           ...chartLayoutDefaults,
           title: `Decision path for sample ${selectedSample + 1}`,
           margin: { l: 100, r: 24, t: 40, b: 120 },
-          height: 520,
+          height: 440,
           xaxis: { tickangle: -45, tickfont: { color: '#cbd5e1' } },
           yaxis: { title: 'Cumulative SHAP', tickfont: { color: '#cbd5e1' } },
         }}
         useResizeHandler
-        style={{ width: '100%', minHeight: 520 }}
+        style={{ width: '100%', minHeight: 440 }}
       />
     );
   }, [normalizedFeatureNames, shapMatrix, selectedSample]);
@@ -273,15 +273,84 @@ export default function LiveShapAnalyzer() {
           ...chartLayoutDefaults,
           title: `Force-style contribution for sample ${selectedSample + 1}`,
           margin: { l: 180, r: 24, t: 40, b: 40 },
-          height: 520,
+          height: 440,
           xaxis: { title: 'SHAP contribution', tickfont: { color: '#cbd5e1' } },
           yaxis: { automargin: true, tickfont: { color: '#cbd5e1' } },
         }}
         useResizeHandler
-        style={{ width: '100%', minHeight: 520 }}
+        style={{ width: '100%', minHeight: 440 }}
       />
     );
   }, [normalizedFeatureNames, shapMatrix, selectedSample]);
+
+  const decisionOverviewPlot = useMemo(() => {
+    if (!shapMatrix.length || !normalizedFeatureNames.length) return null;
+    const sampleLimit = Math.min(shapMatrix.length, 10);
+    const traces = Array.from({ length: sampleLimit }, (_, sampleIndex) => {
+      const values = shapMatrix[sampleIndex];
+      const cumulative = values.reduce<number[]>((acc, value, idx) => {
+        const next = (acc[idx - 1] ?? 0) + value;
+        return [...acc, next];
+      }, []);
+      const shade = 0.2 + 0.8 * (sampleIndex / Math.max(1, sampleLimit - 1));
+      return {
+        x: [0, ...cumulative],
+        y: ['base', ...normalizedFeatureNames],
+        mode: 'lines+markers',
+        line: { color: `rgba(59, 130, 246, ${shade})`, width: 2 },
+        marker: { size: 4, color: `rgba(59, 130, 246, ${shade})` },
+        hovertemplate: `Sample ${sampleIndex + 1}<br>%{y}: %{x:.4f}<extra></extra>`,
+        showlegend: false,
+      };
+    });
+    return (
+      <Plot
+        data={traces}
+        layout={{
+          ...chartLayoutDefaults,
+          title: 'SHAP decision overview across samples',
+          margin: { l: 120, r: 24, t: 40, b: 120 },
+          height: 440,
+          xaxis: { title: 'Model output value', tickfont: { color: '#cbd5e1' }, zerolinecolor: '#718096' },
+          yaxis: { type: 'category', automargin: true, tickfont: { color: '#cbd5e1' } },
+        }}
+        useResizeHandler
+        style={{ width: '100%', minHeight: 440 }}
+      />
+    );
+  }, [normalizedFeatureNames, shapMatrix]);
+
+  const violinPlot = useMemo(() => {
+    if (!shapMatrix.length || !normalizedFeatureNames.length) return null;
+    const traces = normalizedFeatureNames.map((name, idx) => ({
+      type: 'violin',
+      x: shapMatrix.map((row) => row[idx] ?? 0),
+      y: Array(shapMatrix.length).fill(name),
+      orientation: 'h',
+      name,
+      box: { visible: true },
+      meanline: { visible: true },
+      points: 'outliers',
+      hovertemplate: `${name}<br>SHAP: %{x:.4f}<extra></extra>`,
+      marker: { color: `rgba(${40 + (idx * 20) % 215}, ${180 - (idx * 8) % 140}, ${220 - (idx * 6) % 160}, 0.6)` },
+      line: { color: '#cbd5e1' },
+    }));
+    return (
+      <Plot
+        data={traces}
+        layout={{
+          ...chartLayoutDefaults,
+          title: 'SHAP distribution by feature',
+          margin: { l: 180, r: 24, t: 40, b: 120 },
+          height: 440,
+          xaxis: { title: 'SHAP value (impact on model output)', tickfont: { color: '#cbd5e1' } },
+          yaxis: { automargin: true, tickfont: { color: '#cbd5e1' } },
+        }}
+        useResizeHandler
+        style={{ width: '100%', minHeight: 440 }}
+      />
+    );
+  }, [normalizedFeatureNames, shapMatrix]);
 
   const beeswarmPlot = useMemo(() => {
     if (!shapMatrix.length || !normalizedFeatureNames.length || !featureValues.length) return null;
@@ -309,13 +378,13 @@ export default function LiveShapAnalyzer() {
           ...chartLayoutDefaults,
           title: 'Beeswarm-style SHAP distribution',
           margin: { l: 120, r: 24, t: 40, b: 120 },
-          height: 520,
+          height: 440,
           xaxis: { title: 'SHAP value', tickfont: { color: '#cbd5e1' } },
           yaxis: { automargin: true, showticklabels: false, tickfont: { color: '#cbd5e1' } },
           legend: { orientation: 'h', y: -0.2, x: 0, font: { color: '#f8fafc' } },
         }}
         useResizeHandler
-        style={{ width: '100%', minHeight: 520 }}
+        style={{ width: '100%', minHeight: 440 }}
       />
     );
   }, [normalizedFeatureNames, shapMatrix, featureValues]);
@@ -396,16 +465,6 @@ export default function LiveShapAnalyzer() {
             { label: 'Missing Values', value: report.missing_values },
             { label: 'Duplicate Rows', value: report.duplicate_rows },
           ].map((item) => <div key={item.label} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"><p className="text-xs uppercase tracking-[0.18em] text-muted">{item.label}</p><p className="mt-1 text-xl font-semibold text-white">{item.value}</p></div>)}
-          </div>
-
-          <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-            <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-muted">Prediction Table</h3>
-            <div className="mt-4 overflow-x-auto">
-              <table className="min-w-full text-sm text-left text-white/80">
-                <thead><tr className="border-b border-white/10 text-muted"><th className="px-3 py-2">Prediction</th><th className="px-3 py-2">Confidence</th><th className="px-3 py-2">Probability</th></tr></thead>
-                <tbody>{(report.predictions || []).map((row, index) => <tr key={index} className="border-b border-white/10"><td className="px-3 py-2">{row.prediction}</td><td className="px-3 py-2">{(row.confidence ?? 0).toFixed(4)}</td><td className="px-3 py-2">{(row.probability ?? 0).toFixed(4)}</td></tr>)}</tbody>
-              </table>
-            </div>
           </div>
 
           <div className="mt-8 grid gap-6 lg:grid-cols-2">
@@ -490,6 +549,28 @@ export default function LiveShapAnalyzer() {
                 </select>
               </div>
               <div className="mt-4 flex-1">{forcePlot || <p className="text-sm text-muted">Select a feature or sample to render the force plot.</p>}</div>
+            </section>
+
+            <section className="flex h-full flex-col rounded-2xl border border-white/10 bg-white/5 p-4 shadow-lg">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-muted">Decision Overview</h3>
+                  <p className="text-xs text-slate-400">Compare decision paths for the first few samples.</p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/[0.05] px-3 py-2 text-xs text-white/80">Interactive</div>
+              </div>
+              <div className="mt-4 flex-1">{decisionOverviewPlot || <p className="text-sm text-muted">Decision overview data is unavailable for this dataset.</p>}</div>
+            </section>
+
+            <section className="flex h-full flex-col rounded-2xl border border-white/10 bg-white/5 p-4 shadow-lg">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-muted">SHAP Violin</h3>
+                  <p className="text-xs text-slate-400">Feature SHAP density distribution across samples.</p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/[0.05] px-3 py-2 text-xs text-white/80">Interactive</div>
+              </div>
+              <div className="mt-4 flex-1">{violinPlot || <p className="text-sm text-muted">Violin plot data is unavailable for this dataset.</p>}</div>
             </section>
           </div>
         </motion.div>
