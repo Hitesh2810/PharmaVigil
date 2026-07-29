@@ -21,6 +21,47 @@ class LiveShapService:
         self._model_cache: dict[str, Any] = {}
         self._explainer_cache: dict[str, Any] = {}
 
+    def _to_python_value(self, value: Any) -> Any:
+        if isinstance(value, np.generic):
+            return value.item()
+        if isinstance(value, (np.ndarray, list, tuple)):
+            return np.asarray(value).tolist()
+        if pd.isna(value):
+            return None
+        return value
+
+    def _to_records(self, frame: pd.DataFrame) -> list[dict[str, Any]]:
+        frame = frame.copy()
+        for col in frame.columns:
+            frame[col] = frame[col].apply(self._to_python_value)
+        return frame.to_dict(orient='records')
+
+    def _sanitize_report(self, obj: Any) -> Any:
+        """Recursively convert numpy/pandas types to native Python types for JSON serialization."""
+        try:
+            if isinstance(obj, dict):
+                return {k: self._sanitize_report(v) for k, v in obj.items()}
+            if isinstance(obj, list):
+                return [self._sanitize_report(v) for v in obj]
+            if isinstance(obj, tuple):
+                return tuple(self._sanitize_report(v) for v in obj)
+            if isinstance(obj, np.generic):
+                return obj.item()
+            if isinstance(obj, (np.ndarray,)):
+                try:
+                    return obj.tolist()
+                except Exception:
+                    return [self._sanitize_report(v) for v in obj]
+            # pandas NA / NaN
+            try:
+                if pd.isna(obj):
+                    return None
+            except Exception:
+                pass
+            return obj
+        except Exception:
+            return obj
+
     def _get_model_bundle(self, model_name: str) -> dict[str, Any]:
         if model_name in self._model_cache and model_name in self._explainer_cache:
             return {'model': self._model_cache[model_name], 'explainer': self._explainer_cache[model_name]}
@@ -106,10 +147,39 @@ class LiveShapService:
             shap_values = shap_values.reshape(1, -1)
 
         feature_names = list(features.columns)
+        raw_feature_values = self._to_records(dataset[feature_names])
         predictions = []
         for idx in range(min(len(dataset), 10)):
             row = features.iloc[[idx]]
             predictions.append(self._predict(model_name, row))
+
+        predictions_all = []
+        if model_name in {'classification', 'causality'}:
+            probabilities = model.predict_proba(features)
+            for raw_probs in probabilities:
+                pred_index = int(np.argmax(raw_probs))
+                if model_name == 'classification':
+                    label = self.registry.label_encoders['target'].inverse_transform([pred_index])[0]
+                else:
+                    label = self._get_model_bundle(model_name)['model'].classes_[pred_index]
+                predictions_all.append({
+                    'prediction': str(label),
+                    'confidence': float(np.max(raw_probs)),
+                    'probability': float(np.max(raw_probs)),
+                    'probabilities': {str(cls): float(prob) for cls, prob in zip(model.classes_, raw_probs)},
+                })
+        else:
+            raw_preds = model.predict(features)
+            for raw_pred in raw_preds:
+                predictions_all.append({'prediction': float(raw_pred)})
+
+        base_value = None
+        if hasattr(explainer, 'expected_value'):
+            base_value = explainer.expected_value
+            if isinstance(base_value, np.generic):
+                base_value = base_value.item()
+            elif isinstance(base_value, np.ndarray):
+                base_value = base_value.tolist()
 
         report = {
             'model_used': model_name,
@@ -120,6 +190,11 @@ class LiveShapService:
             'prediction_time': 'N/A',
             'average_confidence': round(float(np.mean([item.get('confidence', 0.0) for item in predictions])) if predictions else 0.0, 4),
             'feature_names': feature_names,
+            'raw_shap_values': shap_values.tolist(),
+            'raw_feature_values': raw_feature_values,
+            'predictions_all': predictions_all,
+            'base_value': base_value,
+            'shap_importance': np.abs(shap_values).mean(axis=0).tolist(),
             'plots': {
                 'summary_plot': self._safe_plot(build_summary_plot, shap_values, feature_names, features),
                 'beeswarm_plot': self._safe_plot(build_beeswarm_plot, shap_values, feature_names, features),
@@ -135,6 +210,12 @@ class LiveShapService:
             report['plots']['dependence_plot'] = build_dependence_plot(shap_values, feature_names, feature_name, features)
         else:
             report['plots']['dependence_plot'] = ''
+
+        # Ensure all values are JSON-serializable (convert numpy/pandas scalars/arrays)
+        try:
+            report = self._sanitize_report(report)
+        except Exception:
+            logger.exception('Failed to sanitize report for JSON serialization')
 
         return report
 

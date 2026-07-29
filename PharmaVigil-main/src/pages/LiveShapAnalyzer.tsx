@@ -1,9 +1,17 @@
 import { useMemo, useState } from 'react';
+import Plot from 'react-plotly.js';
 import { motion } from 'framer-motion';
 import { AlertCircle, BarChart3, FileSpreadsheet, Sparkles, UploadCloud } from 'lucide-react';
 import axios from 'axios';
 
 const API_BASE = 'http://localhost:5000/api';
+
+interface PredictionRow {
+  prediction?: string;
+  confidence?: number;
+  probability?: number;
+  probabilities?: Record<string, number>;
+}
 
 interface ReportData {
   model_used?: string;
@@ -13,16 +21,22 @@ interface ReportData {
   duplicate_rows?: number;
   average_confidence?: number;
   feature_names?: string[];
-  predictions?: Array<{ prediction?: string; confidence?: number; probability?: number }>;
+  raw_shap_values?: number[][];
+  raw_feature_values?: Array<Record<string, any>>;
+  predictions_all?: PredictionRow[];
+  base_value?: number | number[] | null;
+  shap_importance?: number[];
+  predictions?: PredictionRow[];
   plots?: Record<string, string>;
 }
 
 export default function LiveShapAnalyzer() {
   const [file, setFile] = useState<File | null>(null);
   const [model, setModel] = useState('classification');
-  const [featureName, setFeatureName] = useState('');
   const [preview, setPreview] = useState<any>(null);
   const [report, setReport] = useState<ReportData | null>(null);
+  const [selectedSample, setSelectedSample] = useState(0);
+  const [selectedFeature, setSelectedFeature] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -60,7 +74,6 @@ export default function LiveShapAnalyzer() {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('model', model);
-      if (featureName) formData.append('feature_name', featureName);
       const response = await axios.post(`${API_BASE}/live-shap/generate`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
       const payload = response.data?.data || response.data;
       setReport(payload);
@@ -72,18 +85,6 @@ export default function LiveShapAnalyzer() {
     }
   };
 
-  const hexToBase64 = (hex: string) => {
-    const normalized = hex.replace(/\s+/g, '');
-    const bytes = new Uint8Array(normalized.length / 2);
-    for (let index = 0; index < bytes.length; index += 1) {
-      bytes[index] = parseInt(normalized.slice(index * 2, index * 2 + 2), 16);
-    }
-    let binary = '';
-    bytes.forEach((byte) => {
-      binary += String.fromCharCode(byte);
-    });
-    return btoa(binary);
-  };
 
   const previewSummary = useMemo(() => preview ? [
     { label: 'Rows', value: preview.rows },
@@ -91,6 +92,233 @@ export default function LiveShapAnalyzer() {
     { label: 'Missing Values', value: preview.missing_values },
     { label: 'Duplicate Rows', value: preview.duplicate_rows },
   ] : [], [preview]);
+
+  const normalizedFeatureNames = useMemo(() => report?.feature_names ?? [], [report]);
+  const shapMatrix = useMemo(() => report?.raw_shap_values ?? [], [report]);
+  const featureValues = useMemo(() => report?.raw_feature_values ?? [], [report]);
+
+  const chartLayoutDefaults = {
+    paper_bgcolor: 'rgba(0,0,0,0)',
+    plot_bgcolor: 'rgba(0,0,0,0)',
+    font: { color: '#f8fafc' },
+    legend: { font: { color: '#f8fafc' } },
+    hoverlabel: { bgcolor: '#111827', bordercolor: '#374151', font: { color: '#f8fafc' } },
+  };
+
+  const summaryPlot = useMemo(() => {
+    if (!report?.feature_names || !report?.shap_importance) return null;
+    const labels = report.feature_names;
+    const values = report.shap_importance;
+    return (
+      <Plot
+        data={[{
+          x: values,
+          y: labels,
+          type: 'bar',
+          orientation: 'h',
+          marker: { color: values, colorscale: 'Viridis', reversescale: true },
+          hovertemplate: '%{y}<br>Mean |SHAP|: %{x:.4f}<extra></extra>',
+        }]}
+        layout={{
+          ...chartLayoutDefaults,
+          title: 'Global mean |SHAP| importance',
+          margin: { l: 180, r: 24, t: 40, b: 40 },
+          height: 520,
+          xaxis: { title: 'Mean |SHAP|', tickfont: { color: '#cbd5e1' } },
+          yaxis: { automargin: true, tickfont: { color: '#cbd5e1' } },
+        }}
+        useResizeHandler
+        style={{ width: '100%', minHeight: 520 }}
+      />
+    );
+  }, [report]);
+
+  const heatmapPlot = useMemo(() => {
+    if (!shapMatrix.length || !normalizedFeatureNames.length) return null;
+    return (
+      <Plot
+        data={[{
+          z: shapMatrix,
+          x: normalizedFeatureNames,
+          y: shapMatrix.map((_, idx) => `Sample ${idx + 1}`),
+          type: 'heatmap',
+          colorscale: 'Picnic',
+          reversescale: true,
+          colorbar: { title: 'SHAP Value', tickfont: { color: '#f8fafc' }, titlefont: { color: '#f8fafc' } },
+          hovertemplate: '%{y}<br>%{x}<br>SHAP: %{z:.4f}<extra></extra>',
+        }]}
+        layout={{
+          ...chartLayoutDefaults,
+          title: 'SHAP heatmap across all samples',
+          margin: { l: 120, r: 24, t: 40, b: 120 },
+          height: 520,
+          xaxis: { tickangle: -45, tickfont: { color: '#cbd5e1' } },
+          yaxis: { automargin: true, tickfont: { color: '#cbd5e1' } },
+        }}
+        useResizeHandler
+        style={{ width: '100%', minHeight: 520 }}
+      />
+    );
+  }, [normalizedFeatureNames, shapMatrix]);
+
+  const waterfallPlot = useMemo(() => {
+    if (!shapMatrix.length || !normalizedFeatureNames.length || !featureValues.length) return null;
+    const sample = shapMatrix[selectedSample] ?? [];
+    const featurePairs = normalizedFeatureNames.map((name, idx) => ({ name, value: sample[idx] ?? 0 }));
+    const sorted = featurePairs.sort((a, b) => Math.abs(b.value) - Math.abs(a.value)).slice(0, 12);
+    return (
+      <Plot
+        data={[{
+          x: sorted.map((item) => item.name),
+          y: sorted.map((item) => item.value),
+          type: 'bar',
+          marker: { color: sorted.map((item) => (item.value >= 0 ? '#22c55e' : '#f97316')) },
+          hovertemplate: '%{x}<br>SHAP: %{y:.4f}<extra></extra>',
+        }]}
+        layout={{
+          ...chartLayoutDefaults,
+          title: `Top feature contributions for sample ${selectedSample + 1}`,
+          margin: { l: 120, r: 24, t: 40, b: 120 },
+          height: 520,
+          xaxis: { tickangle: -45, tickfont: { color: '#cbd5e1' } },
+          yaxis: { title: 'SHAP value', tickfont: { color: '#cbd5e1' } },
+        }}
+        useResizeHandler
+        style={{ width: '100%', minHeight: 520 }}
+      />
+    );
+  }, [normalizedFeatureNames, shapMatrix, selectedSample, featureValues]);
+
+  const dependencePlot = useMemo(() => {
+    if (!shapMatrix.length || !normalizedFeatureNames.length || !featureValues.length || !selectedFeature) return null;
+    const index = normalizedFeatureNames.indexOf(selectedFeature);
+    if (index === -1) return null;
+    const featureVals = featureValues.map((row) => row[selectedFeature]);
+    const shapVals = shapMatrix.map((row) => row[index] ?? 0);
+    return (
+      <Plot
+        data={[{
+          x: featureVals,
+          y: shapVals,
+          mode: 'markers',
+          marker: { color: shapVals, colorscale: 'Portland', showscale: true, colorbar: { title: 'SHAP' } },
+          hovertemplate: `${selectedFeature}: %{x}<br>SHAP: %{y:.4f}<extra></extra>`,
+        }]}
+        layout={{
+          ...chartLayoutDefaults,
+          title: `Dependence plot for ${selectedFeature}`,
+          margin: { l: 80, r: 24, t: 40, b: 120 },
+          height: 520,
+          xaxis: { title: `${selectedFeature} value`, tickangle: -45, tickfont: { color: '#cbd5e1' } },
+          yaxis: { title: 'SHAP value', tickfont: { color: '#cbd5e1' } },
+        }}
+        useResizeHandler
+        style={{ width: '100%', minHeight: 520 }}
+      />
+    );
+  }, [normalizedFeatureNames, shapMatrix, featureValues, selectedFeature]);
+
+  const decisionPlot = useMemo(() => {
+    if (!shapMatrix.length || !normalizedFeatureNames.length) return null;
+    const sample = shapMatrix[selectedSample] ?? [];
+    const cumulative = sample.reduce<number[]>((acc, value, idx) => {
+      const next = (acc[idx - 1] ?? 0) + value;
+      return [...acc, next];
+    }, []);
+    return (
+      <Plot
+        data={[{
+          x: ['base', ...normalizedFeatureNames],
+          y: [0, ...cumulative],
+          type: 'scatter',
+          mode: 'lines+markers',
+          line: { color: '#38bdf8', width: 3 },
+          marker: { color: '#22d3ee', size: 8 },
+          hovertemplate: '%{x}<br>Cumulative SHAP: %{y:.4f}<extra></extra>',
+        }]}
+        layout={{
+          ...chartLayoutDefaults,
+          title: `Decision path for sample ${selectedSample + 1}`,
+          margin: { l: 100, r: 24, t: 40, b: 120 },
+          height: 520,
+          xaxis: { tickangle: -45, tickfont: { color: '#cbd5e1' } },
+          yaxis: { title: 'Cumulative SHAP', tickfont: { color: '#cbd5e1' } },
+        }}
+        useResizeHandler
+        style={{ width: '100%', minHeight: 520 }}
+      />
+    );
+  }, [normalizedFeatureNames, shapMatrix, selectedSample]);
+
+  const forcePlot = useMemo(() => {
+    if (!shapMatrix.length || !normalizedFeatureNames.length) return null;
+    const sample = shapMatrix[selectedSample] ?? [];
+    const sortedFeatures = normalizedFeatureNames.map((name, idx) => ({
+      name,
+      shap: sample[idx] ?? 0,
+    })).sort((a, b) => Math.abs(b.shap) - Math.abs(a.shap)).slice(0, 12);
+    return (
+      <Plot
+        data={[{
+          x: sortedFeatures.map((item) => item.shap),
+          y: sortedFeatures.map((item) => item.name),
+          type: 'bar',
+          orientation: 'h',
+          marker: {
+            color: sortedFeatures.map((item) => (item.shap >= 0 ? '#22c55e' : '#fb7185')),
+          },
+          hovertemplate: '%{y}<br>SHAP: %{x:.4f}<extra></extra>',
+        }]}
+        layout={{
+          ...chartLayoutDefaults,
+          title: `Force-style contribution for sample ${selectedSample + 1}`,
+          margin: { l: 180, r: 24, t: 40, b: 40 },
+          height: 520,
+          xaxis: { title: 'SHAP contribution', tickfont: { color: '#cbd5e1' } },
+          yaxis: { automargin: true, tickfont: { color: '#cbd5e1' } },
+        }}
+        useResizeHandler
+        style={{ width: '100%', minHeight: 520 }}
+      />
+    );
+  }, [normalizedFeatureNames, shapMatrix, selectedSample]);
+
+  const beeswarmPlot = useMemo(() => {
+    if (!shapMatrix.length || !normalizedFeatureNames.length || !featureValues.length) return null;
+    const traces = normalizedFeatureNames.map((name, idx) => ({
+      x: shapMatrix.map((row) => row[idx] ?? 0),
+      y: shapMatrix.map((_, sampleIndex) => `${name}`),
+      text: featureValues.map((row, sampleIndex) => `Sample ${sampleIndex + 1}`),
+      type: 'scatter',
+      mode: 'markers',
+      name,
+      marker: {
+        size: 6,
+        color: shapMatrix.map((row) => row[idx] ?? 0),
+        colorscale: 'RdBu',
+        cmin: -Math.max(...(shapMatrix.map((row) => Math.abs(row[idx] ?? 0)))),
+        cmax: Math.max(...(shapMatrix.map((row) => Math.abs(row[idx] ?? 0)))),
+        showscale: false,
+      },
+      hovertemplate: `${name}<br>SHAP: %{x:.4f}<br>%{text}<extra></extra>`,
+    }));
+    return (
+      <Plot
+        data={traces}
+        layout={{
+          ...chartLayoutDefaults,
+          title: 'Beeswarm-style SHAP distribution',
+          margin: { l: 120, r: 24, t: 40, b: 120 },
+          height: 520,
+          xaxis: { title: 'SHAP value', tickfont: { color: '#cbd5e1' } },
+          yaxis: { automargin: true, showticklabels: false, tickfont: { color: '#cbd5e1' } },
+          legend: { orientation: 'h', y: -0.2, x: 0, font: { color: '#f8fafc' } },
+        }}
+        useResizeHandler
+        style={{ width: '100%', minHeight: 520 }}
+      />
+    );
+  }, [normalizedFeatureNames, shapMatrix, featureValues]);
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-6 px-4 py-10 sm:px-6 lg:px-8">
@@ -181,13 +409,88 @@ export default function LiveShapAnalyzer() {
           </div>
 
           <div className="mt-8 grid gap-6 lg:grid-cols-2">
-            {report.plots?.summary_plot ? <img src={`data:image/png;base64,${hexToBase64(report.plots.summary_plot)}`} alt="SHAP summary plot" className="w-full rounded-2xl border border-white/10" /> : null}
-            {report.plots?.feature_importance ? <img src={`data:image/png;base64,${hexToBase64(report.plots.feature_importance)}`} alt="Feature importance plot" className="w-full rounded-2xl border border-white/10" /> : null}
-            {report.plots?.beeswarm_plot ? <img src={`data:image/png;base64,${hexToBase64(report.plots.beeswarm_plot)}`} alt="Beeswarm plot" className="w-full rounded-2xl border border-white/10" /> : null}
-            {report.plots?.heatmap ? <img src={`data:image/png;base64,${hexToBase64(report.plots.heatmap)}`} alt="Heatmap" className="w-full rounded-2xl border border-white/10" /> : null}
-            {report.plots?.waterfall_plot ? <img src={`data:image/png;base64,${hexToBase64(report.plots.waterfall_plot)}`} alt="Waterfall plot" className="w-full rounded-2xl border border-white/10" /> : null}
-            {report.plots?.dependence_plot ? <img src={`data:image/png;base64,${hexToBase64(report.plots.dependence_plot)}`} alt="Dependence plot" className="w-full rounded-2xl border border-white/10" /> : null}
-            {report.plots?.decision_plot ? <img src={`data:image/png;base64,${hexToBase64(report.plots.decision_plot)}`} alt="Decision plot" className="w-full rounded-2xl border border-white/10" /> : null}
+            {summaryPlot && (
+              <section className="flex h-full flex-col rounded-2xl border border-white/10 bg-white/5 p-4 shadow-lg">
+                <div>
+                  <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-muted">Global Summary</h3>
+                  <div className="mt-4">{summaryPlot}</div>
+                </div>
+              </section>
+            )}
+
+            <section className="flex h-full flex-col rounded-2xl border border-white/10 bg-white/5 p-4 shadow-lg">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-muted">SHAP Beeswarm</h3>
+                  <p className="text-xs text-slate-400">Hover to inspect feature contributions per sample.</p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/[0.05] px-3 py-2 text-xs text-white/80">Interactive</div>
+              </div>
+              <div className="mt-4 flex-1">{beeswarmPlot || <p className="text-sm text-muted">Beeswarm plot data is unavailable for this dataset.</p>}</div>
+            </section>
+
+            <section className="flex h-full flex-col rounded-2xl border border-white/10 bg-white/5 p-4 shadow-lg">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-muted">SHAP Heatmap</h3>
+                  <p className="text-xs text-slate-400">Visualize feature attribution across all samples.</p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/[0.05] px-3 py-2 text-xs text-white/80">Interactive</div>
+              </div>
+              <div className="mt-4 flex-1">{heatmapPlot || <p className="text-sm text-muted">Heatmap data is unavailable for this dataset.</p>}</div>
+            </section>
+
+            <section className="flex h-full flex-col rounded-2xl border border-white/10 bg-white/5 p-4 shadow-lg">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-muted">Waterfall Explanation</h3>
+                  <p className="text-xs text-slate-400">Top contributors for a selected sample.</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <label className="text-xs uppercase tracking-[0.18em] text-muted">Sample</label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={Math.max(1, shapMatrix.length)}
+                    value={selectedSample + 1}
+                    onChange={(event) => setSelectedSample(Math.max(0, Math.min(shapMatrix.length - 1, Number(event.target.value) - 1)))}
+                    className="w-20 rounded-xl border border-white/10 bg-slate-950/80 px-3 py-2 text-sm text-white"
+                  />
+                </div>
+              </div>
+              <div className="mt-4 flex-1">{waterfallPlot || <p className="text-sm text-muted">Waterfall plot is unavailable for this dataset.</p>}</div>
+            </section>
+
+            <section className="flex h-full flex-col rounded-2xl border border-white/10 bg-white/5 p-4 shadow-lg">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-muted">Decision Plot</h3>
+                  <p className="text-xs text-slate-400">Cumulative SHAP path for the selected sample.</p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/[0.05] px-3 py-2 text-xs text-white/80">Interactive</div>
+              </div>
+              <div className="mt-4 flex-1">{decisionPlot || <p className="text-sm text-muted">Decision plot data is unavailable for this dataset.</p>}</div>
+            </section>
+
+            <section className="flex h-full flex-col rounded-2xl border border-white/10 bg-white/5 p-4 shadow-lg">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-muted">Force Plot</h3>
+                  <p className="text-xs text-slate-400">Feature contributions pushing the prediction up or down.</p>
+                </div>
+                <select
+                  value={selectedFeature}
+                  onChange={(event) => setSelectedFeature(event.target.value)}
+                  className="rounded-2xl border border-white/10 bg-slate-950/80 px-3 py-2 text-sm text-white"
+                >
+                  <option value="">Choose feature</option>
+                  {normalizedFeatureNames.map((feature) => (
+                    <option key={feature} value={feature}>{feature}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="mt-4 flex-1">{forcePlot || <p className="text-sm text-muted">Select a feature or sample to render the force plot.</p>}</div>
+            </section>
           </div>
         </motion.div>
       )}
