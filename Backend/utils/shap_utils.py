@@ -9,6 +9,19 @@ from typing import Any
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+plt.rcParams.update({
+    'figure.facecolor': '#0b1220',
+    'axes.facecolor': '#0d172d',
+    'axes.edgecolor': '#4f5b79',
+    'axes.labelcolor': '#dbe2ef',
+    'xtick.color': '#dbe2ef',
+    'ytick.color': '#dbe2ef',
+    'text.color': '#f8fafc',
+    'grid.color': '#334155',
+    'grid.linestyle': '--',
+    'grid.alpha': 0.35,
+    'font.size': 10,
+})
 import numpy as np
 import pandas as pd
 import shap
@@ -124,9 +137,14 @@ def build_feature_importance(shap_values: Any, feature_names: list[str]) -> str:
     ordered_names = [feature_names[i] for i in order]
     ordered_values = values[order]
     fig, ax = plt.subplots(figsize=(9, 5))
-    ax.barh(ordered_names, ordered_values)
+    cmap = plt.get_cmap('viridis')
+    colors = [cmap(i / len(ordered_values)) for i in range(len(ordered_values))]
+    ax.barh(ordered_names, ordered_values, color=colors, edgecolor='#cbd5e1')
     ax.invert_yaxis()
-    ax.set_title('Feature Importance')
+    ax.set_title('Feature Importance', color='#f8fafc')
+    ax.set_xlabel('Mean |SHAP|', color='#cbd5e1')
+    ax.set_ylabel('Feature', color='#cbd5e1')
+    ax.grid(axis='x', alpha=0.3)
     fig.tight_layout()
     return _fig_to_base64(fig)
 
@@ -139,9 +157,13 @@ def build_waterfall_plot(shap_values: Any, feature_names: list[str], sample_inde
     names = [feature_names[i] for i in ordered]
     bar_values = values[ordered]
     fig, ax = plt.subplots(figsize=(10, 6))
-    ax.barh(names, bar_values)
+    cmap = plt.get_cmap('plasma')
+    colors = [cmap(i / len(bar_values)) for i in range(len(bar_values))]
+    ax.barh(names, bar_values, color=colors, edgecolor='#cbd5e1')
     ax.invert_yaxis()
-    ax.set_title('Waterfall-style Feature Contributions')
+    ax.set_title('Waterfall-style Feature Contributions', color='#f8fafc')
+    ax.set_xlabel('SHAP value', color='#cbd5e1')
+    ax.grid(axis='x', alpha=0.25)
     fig.tight_layout()
     return _fig_to_base64(fig)
 
@@ -160,21 +182,24 @@ def build_dependence_plot(shap_values: Any, feature_names: list[str], feature_na
 def build_heatmap(shap_values: Any, feature_names: list[str], features: pd.DataFrame | None = None) -> str:
     shap_exp = _build_shap_explanation(shap_values, feature_names, features)
     fig, ax = plt.subplots(figsize=(10, 6))
-    shap.plots.heatmap(shap_exp, show=False)
+    shap.plots.heatmap(shap_exp, show=False, cmap='coolwarm')
+    ax.set_title('SHAP Heatmap', color='#f8fafc')
     fig.tight_layout()
     return _fig_to_base64(fig)
 
 
 def build_decision_plot(shap_values: Any, feature_names: list[str], values: pd.DataFrame) -> str:
-    values = np.asarray(shap_values)
-    if values.ndim > 1:
-        values = values[0]
+    shap_values = _normalize_shap_values(shap_values, feature_names)
+    values = shap_values[0] if shap_values.ndim > 1 else shap_values
     cumulative = np.cumsum(values)
     fig, ax = plt.subplots(figsize=(10, 6))
-    ax.plot(range(len(feature_names) + 1), np.insert(cumulative, 0, 0), marker='o')
+    ax.plot(range(len(feature_names) + 1), np.insert(cumulative, 0, 0), marker='o', color='#38bdf8')
+    ax.scatter(range(len(feature_names) + 1), np.insert(cumulative, 0, 0), color='#93c5fd')
     ax.set_xticks(range(len(feature_names) + 1))
-    ax.set_xticklabels(['base'] + feature_names, rotation=45, ha='right')
-    ax.set_title('Decision Path')
+    ax.set_xticklabels(['base'] + feature_names, rotation=45, ha='right', color='#f8fafc')
+    ax.set_title('Decision Path', color='#f8fafc')
+    ax.set_ylabel('Cumulative SHAP', color='#cbd5e1')
+    ax.grid(alpha=0.25)
     fig.tight_layout()
     return _fig_to_base64(fig)
 
