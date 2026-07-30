@@ -98,7 +98,22 @@ def _normalize_shap_values(shap_values: Any, feature_names: list[str] | None = N
     return shap_values
 
 
-def _build_shap_explanation(shap_values: Any, feature_names: list[str], features: pd.DataFrame | None = None) -> shap.Explanation:
+def _normalize_base_values(base_values: Any, sample_count: int) -> Any:
+    if base_values is None:
+        return None
+    if isinstance(base_values, list):
+        base_values = np.asarray(base_values)
+    if isinstance(base_values, np.ndarray):
+        if base_values.ndim == 2 and base_values.shape[0] == sample_count and base_values.shape[1] == 1:
+            return base_values[:, 0]
+        if base_values.ndim == 2 and base_values.shape[0] == sample_count:
+            return base_values
+        if base_values.ndim == 1 and base_values.shape[0] == sample_count:
+            return base_values
+    return base_values
+
+
+def _build_shap_explanation(shap_values: Any, feature_names: list[str], features: pd.DataFrame | None = None, base_values: Any = None) -> shap.Explanation:
     values = _normalize_shap_values(shap_values, feature_names)
     if values.ndim != 2 or values.shape[1] != len(feature_names):
         raise SHAPAnalysisError('SHAP values shape does not match feature names.')
@@ -111,19 +126,23 @@ def _build_shap_explanation(shap_values: Any, feature_names: list[str], features
     else:
         features = pd.DataFrame(features, columns=feature_names)
 
+    base_values = _normalize_base_values(base_values, values.shape[0])
+    if base_values is not None:
+        return shap.Explanation(values=values, base_values=base_values, data=features, feature_names=feature_names)
+
     return shap.Explanation(values=values, data=features, feature_names=feature_names)
 
 
-def build_summary_plot(shap_values: Any, feature_names: list[str], features: pd.DataFrame | None = None) -> str:
-    shap_exp = _build_shap_explanation(shap_values, feature_names, features)
+def build_summary_plot(shap_values: Any, feature_names: list[str], features: pd.DataFrame | None = None, base_values: Any = None) -> str:
+    shap_exp = _build_shap_explanation(shap_values, feature_names, features, base_values=base_values)
     fig, ax = plt.subplots(figsize=(10, 6))
     shap.summary_plot(shap_exp, show=False, plot_type='bar')
     fig.tight_layout()
     return _fig_to_base64(fig)
 
 
-def build_beeswarm_plot(shap_values: Any, feature_names: list[str], features: pd.DataFrame | None = None) -> str:
-    shap_exp = _build_shap_explanation(shap_values, feature_names, features)
+def build_beeswarm_plot(shap_values: Any, feature_names: list[str], features: pd.DataFrame | None = None, base_values: Any = None) -> str:
+    shap_exp = _build_shap_explanation(shap_values, feature_names, features, base_values=base_values)
     fig, ax = plt.subplots(figsize=(10, 6))
     shap.summary_plot(shap_exp, show=False)
     fig.tight_layout()

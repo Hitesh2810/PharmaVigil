@@ -12,6 +12,48 @@ import shap
 from models_loader.loader import registry
 from utils.shap_utils import SHAPAnalysisError, build_beeswarm_plot, build_decision_plot, build_dependence_plot, build_feature_importance, build_heatmap, build_summary_plot, build_waterfall_plot, prepare_features, validate_dataset
 
+
+def _coerce_shap_values(shap_values: Any, feature_names: list[str]) -> np.ndarray:
+    if shap_values is None:
+        raise SHAPAnalysisError('The selected explainer did not return SHAP values.')
+
+    if isinstance(shap_values, shap.Explanation):
+        shap_values = shap_values.values
+    elif hasattr(shap_values, 'values') and not isinstance(shap_values, (np.ndarray, list, tuple, pd.DataFrame)):
+        shap_values = shap_values.values
+
+    if isinstance(shap_values, list):
+        if shap_values and isinstance(shap_values[0], (list, np.ndarray)):
+            shap_values = np.asarray(shap_values[0])
+        else:
+            shap_values = np.asarray(shap_values)
+    elif isinstance(shap_values, pd.DataFrame):
+        shap_values = shap_values.to_numpy()
+    elif not isinstance(shap_values, np.ndarray):
+        shap_values = np.asarray(shap_values)
+
+    if shap_values.ndim == 0:
+        shap_values = shap_values.reshape(1, -1)
+    elif shap_values.ndim == 1:
+        shap_values = shap_values.reshape(1, -1)
+
+    if shap_values.ndim == 2 and shap_values.shape[1] != len(feature_names) and shap_values.shape[0] == len(feature_names):
+        shap_values = shap_values.T
+
+    if shap_values.ndim > 2:
+        if shap_values.shape[-1] == len(feature_names):
+            shap_values = np.asarray(shap_values[..., 0])
+        elif shap_values.shape[0] == len(feature_names):
+            shap_values = np.asarray(shap_values[0])
+        else:
+            shap_values = np.asarray(shap_values[0, 0])
+
+    if shap_values.ndim == 1:
+        shap_values = shap_values.reshape(1, -1)
+    if shap_values.shape[1] != len(feature_names):
+        raise SHAPAnalysisError('SHAP values shape does not match the prepared feature columns.')
+    return shap_values
+
 logger = logging.getLogger(__name__)
 
 
@@ -127,26 +169,44 @@ class LiveShapService:
         explainer = bundle['explainer']
         model = bundle['model']
 
+        feature_names = list(features.columns)
+
         try:
-            shap_values = explainer.shap_values(features)[0] if hasattr(explainer, 'shap_values') else None
+            if callable(explainer):
+                explainer_output = explainer(features)
+            elif hasattr(explainer, 'shap_values'):
+                explainer_output = explainer.shap_values(features)
+            else:
+                explainer_output = None
         except Exception as exc:
             raise SHAPAnalysisError(f'SHAP explanation failed: {exc}') from exc
+
+        shap_values = None
+        if hasattr(explainer_output, 'values'):
+            shap_values = explainer_output.values
+        elif hasattr(explainer_output, 'shap_values'):
+            shap_values = explainer_output.shap_values
+        elif isinstance(explainer_output, tuple):
+            shap_values = explainer_output[0]
+        elif hasattr(explainer_output, '__getitem__') and not isinstance(explainer_output, (str, bytes)):
+            try:
+                shap_values = explainer_output[0]
+            except Exception:
+                shap_values = explainer_output
 
         if shap_values is None:
             raise SHAPAnalysisError('The selected explainer did not return SHAP values.')
 
-        if isinstance(shap_values, list):
-            if shap_values and isinstance(shap_values[0], list):
-                shap_values = np.array(shap_values[0])
+        # For multiclass explainers, match the notebook behavior by selecting class index 1
+        if isinstance(shap_values, np.ndarray) and shap_values.ndim == 3:
+            if shap_values.shape[1] == len(feature_names):
+                shap_values = shap_values[:, :, 1]
+            elif shap_values.shape[2] == len(feature_names):
+                shap_values = shap_values[:, 1, :]
             else:
-                shap_values = np.asarray(shap_values)
-        elif not isinstance(shap_values, np.ndarray):
-            shap_values = np.asarray(shap_values)
+                raise SHAPAnalysisError('SHAP values shape does not match the prepared feature columns.')
 
-        if shap_values.ndim == 1:
-            shap_values = shap_values.reshape(1, -1)
-
-        feature_names = list(features.columns)
+        shap_values = _coerce_shap_values(shap_values, feature_names)
         raw_feature_values = self._to_records(dataset[feature_names])
         predictions = []
         for idx in range(min(len(dataset), 10)):
@@ -196,8 +256,8 @@ class LiveShapService:
             'base_value': base_value,
             'shap_importance': np.abs(shap_values).mean(axis=0).tolist(),
             'plots': {
-                'summary_plot': self._safe_plot(build_summary_plot, shap_values, feature_names, features),
-                'beeswarm_plot': self._safe_plot(build_beeswarm_plot, shap_values, feature_names, features),
+                'summary_plot': self._safe_plot(build_summary_plot, shap_values, feature_names, features, base_value),
+                'beeswarm_plot': self._safe_plot(build_beeswarm_plot, shap_values, feature_names, features, base_value),
                 'feature_importance': self._safe_plot(build_feature_importance, shap_values, feature_names),
                 'waterfall_plot': self._safe_plot(build_waterfall_plot, shap_values, feature_names, sample_index),
                 'heatmap': self._safe_plot(build_heatmap, shap_values, feature_names, features),
