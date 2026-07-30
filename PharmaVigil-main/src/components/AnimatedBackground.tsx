@@ -22,6 +22,16 @@ export function AnimatedBackground() {
         animate={{ x: [0, 20, 0], y: [0, -30, 0] }}
         transition={{ duration: 26, repeat: Infinity, ease: 'easeInOut' }}
       />
+      <motion.div
+        className="absolute inset-x-0 top-16 h-72 opacity-70 blur-[90px] bg-gradient-to-r from-primary/15 via-secondary/10 to-accent/15"
+        animate={{ x: [0, -18, 0], y: [0, 12, 0] }}
+        transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      <motion.div
+        className="absolute left-1/4 top-1/2 h-[18rem] w-[18rem] rounded-full bg-white/15 blur-[80px] opacity-70"
+        animate={{ x: [0, 12, 0], y: [0, -16, 0] }}
+        transition={{ duration: 24, repeat: Infinity, ease: 'easeInOut' }}
+      />
     </div>
   );
 }

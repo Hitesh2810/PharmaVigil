@@ -4,13 +4,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#050816',
-        surface: '#0B1120',
-        'surface-2': '#0E1628',
-        primary: '#3B82F6',
-        secondary: '#06B6D4',
-        accent: '#8B5CF6',
-        muted: '#94A3B8',
+        transparent: 'transparent',
+        current: 'currentColor',
+        background: 'rgb(var(--background) / <alpha-value>)',
+        surface: 'rgb(var(--surface) / <alpha-value>)',
+        'surface-2': 'rgb(var(--surface-2) / <alpha-value>)',
+        primary: 'rgb(var(--primary) / <alpha-value>)',
+        secondary: 'rgb(var(--secondary) / <alpha-value>)',
+        accent: 'rgb(var(--accent) / <alpha-value>)',
+        muted: 'rgb(var(--muted) / <alpha-value>)',
+        white: 'rgb(var(--white) / <alpha-value>)',
+        black: 'rgb(var(--black) / <alpha-value>)',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
