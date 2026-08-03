@@ -10,6 +10,7 @@ import ModelComparison from '@/pages/ModelComparison';
 import About from '@/pages/About';
 import Contact from '@/pages/Contact';
 import LiveShapAnalyzer from '@/pages/LiveShapAnalyzer';
+import { ImplementationFlowPage } from '@/components/ImplementationFlow/ImplementationFlowPage';
 
 export default function App() {
   const location = useLocation();
@@ -25,6 +26,7 @@ export default function App() {
           <Route path="/about" element={<PageTransition><About /></PageTransition>} />
           <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
           <Route path="/live-shap" element={<PageTransition><LiveShapAnalyzer /></PageTransition>} />
+          <Route path="/implementation-flow" element={<ImplementationFlowPage />} />
         </Routes>
       </AnimatePresence>
     </Layout>

@@ -70,17 +70,17 @@ export default function ModelComparison() {
                     const isBest = row[6] as boolean;
                     return (
                       <tr key={row[0] as string} className={`${idx % 2 === 0 ? 'bg-white/3' : 'bg-white/2'} ${isBest ? 'transform scale-102 ring-4 ring-yellow-400/20 shadow-lg' : ''}`}>
-                        <td className={`px-3 py-3 font-medium ${isBest ? 'text-black' : 'text-white'}`}>
+                        <td className={`px-3 py-3 font-medium ${isBest ? 'text-green-400' : 'text-white'}`}>
                           <div className="flex items-center gap-2">
                             {isBest && <div className="rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 p-2"><Trophy className="h-4 w-4 text-white" /></div>}
                             <span className={isBest ? 'font-bold' : ''}>{row[0]}</span>
                           </div>
                         </td>
-                        <td className={`px-3 py-3 text-right ${isBest ? 'font-bold text-black' : 'text-white/80'}`}>{row[1]}</td>
-                        <td className={`px-3 py-3 text-right ${isBest ? 'font-bold text-black text-green-400' : 'text-white/80'}`}>{row[2]}</td>
-                        <td className={`px-3 py-3 text-right ${isBest ? 'font-bold text-black' : 'text-white/80'}`}>{row[3]}</td>
-                        <td className={`px-3 py-3 text-right ${isBest ? 'font-bold text-black' : 'text-white/80'}`}>{row[4]}</td>
-                        <td className={`px-3 py-3 text-right ${isBest ? 'font-bold text-black text-green-500' : 'text-white/80'}`}>{row[5]}</td>
+                        <td className={`px-3 py-3 text-right ${isBest ? 'font-bold text-green-400' : 'text-white/80'}`}>{row[1]}</td>
+                        <td className={`px-3 py-3 text-right ${isBest ? 'font-bold text-green-400' : 'text-white/80'}`}>{row[2]}</td>
+                        <td className={`px-3 py-3 text-right ${isBest ? 'font-bold text-green-400' : 'text-white/80'}`}>{row[3]}</td>
+                        <td className={`px-3 py-3 text-right ${isBest ? 'font-bold text-green-400' : 'text-white/80'}`}>{row[4]}</td>
+                        <td className={`px-3 py-3 text-right ${isBest ? 'font-bold text-green-500' : 'text-white/80'}`}>{row[5]}</td>
                       </tr>
                     );
                   })}
@@ -117,17 +117,17 @@ export default function ModelComparison() {
                     const isBest = row[6] as boolean;
                     return (
                       <tr key={row[0] as string} className={`${idx % 2 === 0 ? 'bg-white/3' : 'bg-white/2'} ${isBest ? 'transform scale-102 ring-4 ring-yellow-400/20 shadow-lg' : ''}`}>
-                        <td className={`px-3 py-3 font-medium ${isBest ? 'text-black' : 'text-white'}`}>
+                        <td className={`px-3 py-3 font-medium ${isBest ? 'text-green-400' : 'text-white'}`}>
                           <div className="flex items-center gap-2">
                             {isBest && <div className="rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 p-2"><Trophy className="h-4 w-4 text-white" /></div>}
                             <span className={isBest ? 'font-bold' : ''}>{row[0]}</span>
                           </div>
                         </td>
-                        <td className={`px-3 py-3 text-right ${isBest ? 'font-bold text-black' : 'text-white/80'}`}>{row[1]}</td>
-                        <td className={`px-3 py-3 text-right ${isBest ? 'font-bold text-black text-green-400' : 'text-white/80'}`}>{row[2]}</td>
-                        <td className={`px-3 py-3 text-right ${isBest ? 'font-bold text-black' : 'text-white/80'}`}>{row[3]}</td>
-                        <td className={`px-3 py-3 text-right ${isBest ? 'font-bold text-black' : 'text-white/80'}`}>{row[4]}</td>
-                        <td className={`px-3 py-3 text-right ${isBest ? 'font-bold text-black text-green-500' : 'text-white/80'}`}>{row[5]}</td>
+                        <td className={`px-3 py-3 text-right ${isBest ? 'font-bold text-green-400' : 'text-white/80'}`}>{row[1]}</td>
+                        <td className={`px-3 py-3 text-right ${isBest ? 'font-bold text-green-400' : 'text-white/80'}`}>{row[2]}</td>
+                        <td className={`px-3 py-3 text-right ${isBest ? 'font-bold text-green-400' : 'text-white/80'}`}>{row[3]}</td>
+                        <td className={`px-3 py-3 text-right ${isBest ? 'font-bold text-green-400' : 'text-white/80'}`}>{row[4]}</td>
+                        <td className={`px-3 py-3 text-right ${isBest ? 'font-bold text-green-500' : 'text-white/80'}`}>{row[5]}</td>
                       </tr>
                     );
                   })}
@@ -162,15 +162,15 @@ export default function ModelComparison() {
                     const isBest = row[4] as boolean;
                     return (
                       <tr key={row[0] as string} className={`${idx % 2 === 0 ? 'bg-white/3' : 'bg-white/2'} ${isBest ? 'transform scale-102 ring-4 ring-yellow-400/20 shadow-lg' : ''}`}>
-                        <td className={`px-3 py-3 font-medium ${isBest ? 'text-black' : 'text-white'}`}>
+                        <td className={`px-3 py-3 font-medium ${isBest ? 'text-green-400' : 'text-white'}`}>
                           <div className="flex items-center gap-2">
                             {isBest && <div className="rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 p-2"><Trophy className="h-4 w-4 text-white" /></div>}
                             <span className={isBest ? 'font-bold' : ''}>{row[0]}</span>
                           </div>
                         </td>
-                        <td className={`px-3 py-3 text-right ${isBest ? 'font-bold text-black text-green-500' : 'text-white/80'}`}>{row[1]}</td>
-                        <td className={`px-3 py-3 text-right ${isBest ? 'font-bold text-black text-green-400' : 'text-white/80'}`}>{row[2]}</td>
-                        <td className={`px-3 py-3 text-right ${isBest ? 'font-bold text-black' : 'text-white/80'}`}>{row[3]}</td>
+                        <td className={`px-3 py-3 text-right ${isBest ? 'font-bold text-green-500' : 'text-white/80'}`}>{row[1]}</td>
+                        <td className={`px-3 py-3 text-right ${isBest ? 'font-bold text-green-400' : 'text-white/80'}`}>{row[2]}</td>
+                        <td className={`px-3 py-3 text-right ${isBest ? 'font-bold text-green-400' : 'text-white/80'}`}>{row[3]}</td>
                       </tr>
                     );
                   })}

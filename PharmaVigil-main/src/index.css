@@ -23,20 +23,21 @@
 
   .theme-light {
     color-scheme: light;
-    --background: 247 249 253;
+    --background: 232 245 255;
     --surface: 255 255 255;
-    --surface-2: 248 250 252;
+    --surface-2: 248 254 255;
     --white: 15 23 42;
     --black: 15 23 42;
-    --text: 15 23 42;
-    --muted: 71 85 105;
-    --primary: 37 99 235;
-    --secondary: 14 116 144;
-    --accent: 106 65 206;
-    --border: 203 213 225;
+    --text: 20 28 51;
+    --muted: 78 103 150;
+    --primary: 42 100 255;
+    --secondary: 14 165 233;
+    --accent: 99 102 241;
+    --border: 206 216 230;
     --card: 255 255 255;
     --shadow: 15 23 42;
-    --selection: 37 99 235;
+    --selection: 59 130 246;
+    --background-gradient: linear-gradient(180deg, rgba(236, 246, 255, 1), rgba(249, 252, 255, 1));
   }
 
   .theme-dark {
@@ -63,6 +64,9 @@
 
   body {
     background-color: rgb(var(--background));
+    background-image: var(--background-gradient, none);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     color: rgb(var(--text));
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     @apply antialiased font-sans;
@@ -125,15 +129,15 @@
   }
 
   .theme-light [class*="bg-white/"] {
-    background-color: rgba(var(--black), 0.08) !important;
+    background-color: rgba(var(--black), 0.12) !important;
   }
 
   .theme-light [class*="bg-white\["] {
-    background-color: rgba(var(--black), 0.08) !important;
+    background-color: rgba(var(--black), 0.12) !important;
   }
 
   .theme-light [class*="border-white/"] {
-    border-color: rgba(var(--black), 0.16) !important;
+    border-color: rgba(var(--black), 0.24) !important;
   }
 
   .theme-light .text-white {
@@ -141,40 +145,62 @@
   }
 
   .theme-light [class*="text-white/"] {
-    color: rgba(var(--text), 0.92) !important;
+    color: rgba(var(--text), 0.96) !important;
   }
 
   .theme-light [class*="bg-slate-950/"] {
     background-color: rgba(var(--black), 0.16) !important;
   }
 
+  .theme-light .theme-toggle-btn {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(240, 248, 255, 0.98));
+    border-color: rgba(37, 99, 235, 0.22);
+    color: rgb(var(--black));
+    box-shadow: 0 28px 90px -38px rgba(37, 99, 255, 0.24);
+  }
+
+  .theme-light .theme-toggle-btn:hover {
+    background: rgb(255 255 255 / 0.98);
+  }
+
+  .theme-light .theme-toggle-btn span {
+    background: rgba(37, 99, 235, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(37, 99, 255, 0.1);
+  }
+
+  .theme-light .theme-toggle-btn svg {
+    color: rgb(var(--black));
+  }
+
   .theme-light .shadow-glow {
-    box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08), 0 24px 80px -32px rgba(15, 23, 42, 0.18);
+    box-shadow: 0 0 0 1px rgba(47, 115, 255, 0.12), 0 42px 96px -36px rgba(47, 115, 255, 0.18);
   }
 
   .theme-light .bg-hero-radial {
-    background-image: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(37, 99, 235, 0.18), transparent 60%);
+    background-image: radial-gradient(ellipse 80% 55% at 50% -15%, rgba(37, 99, 235, 0.26), rgba(14, 165, 233, 0.18));
   }
 
   .theme-light .grid-bg {
     background-image:
-      linear-gradient(to right, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+      linear-gradient(to right, rgba(37, 99, 255, 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(37, 99, 255, 0.06) 1px, transparent 1px);
   }
 
   .theme-light .glass {
-    background: rgb(var(--card) / 0.92);
-    border-color: rgba(var(--border), 0.35);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(241, 248, 255, 0.94));
+    border-color: rgba(var(--border), 0.26);
+    box-shadow: 0 32px 88px -36px rgba(var(--black), 0.12);
   }
 
   .theme-light .glass-strong {
-    background: rgb(var(--card) / 0.95);
-    border-color: rgba(var(--border), 0.45);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(247, 252, 255, 0.98));
+    border-color: rgba(var(--border), 0.38);
+    box-shadow: 0 36px 96px -42px rgba(var(--black), 0.14);
   }
 
   .theme-light .radial-fade {
-    -webkit-mask-image: radial-gradient(circle at 50% 40%, black 32%, transparent 82%);
-    mask-image: radial-gradient(circle at 50% 40%, black 32%, transparent 82%);
+    -webkit-mask-image: radial-gradient(circle at 50% 40%, black 36%, transparent 78%);
+    mask-image: radial-gradient(circle at 50% 40%, black 36%, transparent 78%);
   }
 
   h1, h2, h3, h4, h5, h6 {
